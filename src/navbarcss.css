@@ -1,0 +1,20 @@
+div{
+    alignment: center;
+}
+.divider{
+    align-self: center;
+    padding: 0;
+    margin-bottom: .35em;
+    margin-top: .15em;
+    background-color: #3a3a3a;
+    height:.025em;
+    width: 96%
+
+}
+.halfDiv{
+    height: 1em;
+    background-color: green;
+}
+#bottomDiv{
+    background-color: red;
+}
