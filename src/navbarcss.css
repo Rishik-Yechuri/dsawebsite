@@ -1,20 +1,65 @@
-div{
-    alignment: center;
+.topBar{
+    background-color: #666666;
 }
 .divider{
     align-self: center;
     padding: 0;
-    margin-bottom: .35em;
+    margin-bottom: .15em;
     margin-top: .15em;
-    background-color: #3a3a3a;
-    height:.025em;
-    width: 96%
-
+    background-color: #999999;
+    height:.035em;
+    margin-left: 2em;
+    margin-right: 2em;
+    border-style:none;
 }
 .halfDiv{
-    height: 1em;
-    background-color: green;
+    height: 2.25em;
+}
+#topDiv{
+    max-height: 2.25em;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    margin-left: 3em;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+.dropdown-content a {
+    color: #cccccc;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.dropdown-content a:hover {background-color: #ddd;}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover #dropdownDiv {background-color: #3e8e41;}
+#dropdownDiv{
+    display:flex;
+    alignment: center;
+    justify-content: center;
+    height: 2.25em;
+    width: 12.5em;
+    max-height: 2.25em;
+    margin-left: 3em;
+}
+#dropdownText{
+    margin-top: .15em;
+    color: #cccccc;
+    margin-right: .1em;
+    font-size: x-large;
+    font-weight: 520;
+}
+#dropdownImg{
+    margin-top: .35em;
+    max-height: 1.6em;
+    max-width: 1.6em;
 }
 #bottomDiv{
-    background-color: red;
 }
