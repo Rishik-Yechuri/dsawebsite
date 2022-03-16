@@ -2,9 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 import {Helmet} from "react-helmet";
 import {BrowserRouter as Router, Routes, Route, Switch} from "react-router-dom";
-import navbar from "./navbar"
 import Navbar from "./navbar";
 import React from "react";
+import dropDown from "./dropdown.png";
 
 
 
