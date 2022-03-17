@@ -16,15 +16,16 @@
 
 .halfDiv {
     height: 2.25em;
+
 }
 
 #topDiv {
     max-height: 2.25em;
+    display: flex;
+    flex-direction: row;
 }
 
 .dropdown {
-    position: relative;
-    display: inline-block;
     height: 2.25em;
     width: 12.5em;
     margin-left: 3em;
@@ -52,16 +53,42 @@
     background-color: #888888;
 }
 
-/*.dropdown:hover .dropdown-content {display: block;}*/
 #dropdownDiv {
     display: flex;
-    alignment: center;
-    justify-content: center;
     height: 2.25em;
     width: 12.5em;
     max-height: 2.25em;
 }
-
+#sizeInput{
+    margin-left:1.8em;
+    width:fit-content;
+    height: fit-content;
+    align-self: center;
+}
+#sizeInputField{
+    height: 1.6em;
+    border-style: solid;
+    border-width: .2em;
+    border-color: #333333;
+    background-color: #868686;
+    outline: none;
+   color: #cccccc;
+}
+#createButton{
+    background-color: #8919AB;
+    outline: none;
+    border-style: none;
+    color: #cccccc;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    align-self: center;
+    height: 2.25em;
+    margin-left: 2em;
+    border-radius: .5em;
+}
+#sizeInputField::placeholder{
+    color: #bbbbbb;
+}
 #dropdownText {
     margin-top: .15em;
     color: #cccccc;

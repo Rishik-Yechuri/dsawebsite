@@ -35,9 +35,8 @@ const dropdownComponent = () => {
                 <img src={dropDown} id={"dropdownImg"}/>
             </div>
             <div className="dropdown-content" id={"firstContent"}>
-                <a className={"link"} href="#">Link 1</a>
-                <a className={"link"} href="#">Link 2</a>
-                <a className={"link"} href="#">Link 3</a>
+                <a className={"link"} href="#">Maze</a>
+                <a className={"link"} href="#">Array</a>
             </div>
         </>
     );
