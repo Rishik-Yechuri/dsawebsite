@@ -1,22 +1,28 @@
 import React from 'react';
 import './navbarcss.css';
 import DropdownComponent from "./dropdownComponent";
-import dropDown from "./dropdown.png";
 import startingarrow from "./startingarrow.png";
 import targetnode from "./targetnode.png"
+import  AlgorithmComponent from "./algorithmsDropdown";
+import AlgorithmsDropdown from "./algorithmsDropdown";
 
 const navbar = () => {
-
+    var links = ["Maze","Array"];
     return (
         <div className={"topBar"}>
             <div className={"halfDiv"} id={"topDiv"}>
                 <div className="dropdown" id={"dropdownTop"}>
-                    <DropdownComponent></DropdownComponent>
+                    <DropdownComponent/>
+                </div>
+                <div className="dropdown" >
+                <AlgorithmsDropdown/>
                 </div>
                 <form id={"sizeInput"}>
                     <input type="text" id={"sizeInputField"} placeholder="Border Length"/>
                 </form>
-                <button id={"createButton"}>Create</button>
+                <button className={"button"} id={"createButton"}>Visualize</button>
+                <button className={"button"} >Reset</button>
+
             </div>
 
             <hr className={"divider"}></hr>

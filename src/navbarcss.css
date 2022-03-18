@@ -28,15 +28,20 @@
 .dropdown {
     height: 2.25em;
     width: 12.5em;
-    margin-left: 3em;
+    margin-left: 1.8em;
 
+}
+.dropdown2{
+    margin-left: 1.8em;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
     background-color: #666666;
+    /*
     min-width: 160px;
+    */
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, .5);
     z-index: 1;
 }
@@ -51,16 +56,19 @@
 .dropdown-content a:hover {
     background-color: #888888;
 }
-
+.spaceDiv{
+    margin-left: 1.2em;
+}
 #dropdownDiv {
     display: flex;
     height: 2.25em;
-    width: 12.5em;
+    width:fit-content;
     max-height: 2.25em;
+    margin-left: 0em;
 }
 
 #sizeInput {
-    margin-left: 1.8em;
+    margin-left: 0em;
     width: fit-content;
     height: fit-content;
     align-self: center;
@@ -77,6 +85,12 @@
 }
 
 #createButton {
+
+}
+
+#createButton:hover {
+}
+.button{
     background-color: #8919AB;
     outline: none;
     border-style: none;
@@ -88,11 +102,9 @@
     margin-left: 2em;
     border-radius: .5em;
 }
-
-#createButton:hover {
+.button:hover{
     background-color: #A939CB;
 }
-
 #sizeInputField::placeholder {
     color: #bbbbbb;
 }
@@ -100,10 +112,15 @@
 #dropdownText {
     margin-top: .15em;
     color: #cccccc;
+
     margin-right: .1em;
+
     font-size: x-large;
     font-weight: 520;
     user-select: none;
+}
+#dropdownTop{
+    margin-left: 3em;
 }
 
 #dropdownImg {

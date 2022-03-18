@@ -4,22 +4,22 @@ import './navbarcss.css';
 
 
 
-const dropdownComponent = () => {
+const ArrayAlgorithmComponent = () => {
     var dropDownActivated = false;
     document.addEventListener("click",function (event){
         if(event.target.closest("#dropdownDiv")){
             return;
         }else{
-            document.getElementById("firstContent").style.display = 'none';
+            document.getElementById("thirdContent").style.display = 'none';
             dropDownActivated = false;
         }
     })
     function structureDropdown() {
         if (dropDownActivated) {
-            document.getElementById("firstContent").style.display = 'none';
+            document.getElementById("thirdContent").style.display = 'none';
         }
         if (!dropDownActivated) {
-            document.getElementById("firstContent").style.display = 'block';
+            document.getElementById("thirdContent").style.display = 'block';
         }
         dropDownActivated = !dropDownActivated;
 
@@ -29,15 +29,16 @@ const dropdownComponent = () => {
 
         <>
             <div onClick={structureDropdown} id={"dropdownDiv"}>
-                <text id={"dropdownText"}>Structure:Maze</text>
+                <text id={"dropdownText"}>Algorithm:Bubble Sort</text>
                 <img src={dropDown} id={"dropdownImg"}/>
             </div>
-            <div className="dropdown-content" id={"firstContent"}>
-                <a className={"link"} href="#">Maze</a>
-                <a className={"link"} href="#">Array</a>
+            <div className="dropdown-content" id={"thirdContent"}>
+                <a className={"link"} href="#">Bubble Sort</a>
+                <a className={"link"} href="#">Merge Sort</a>
+                <a className={"link"} href="#">Quick Sort</a>
             </div>
         </>
     );
 }
 
-export default dropdownComponent;
+export default ArrayAlgorithmComponent;
