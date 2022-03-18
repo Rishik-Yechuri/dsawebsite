@@ -26,8 +26,8 @@
 }
 
 .dropdown {
-    height: 2.25em;
-    width: 12.5em;
+    /*height: 2.25em;
+    width: 12.5em;*/
     margin-left: 1.8em;
 
 }
@@ -68,7 +68,7 @@
 }
 
 #sizeInput {
-    margin-left: 0em;
+    margin-left: 1.3em;
     width: fit-content;
     height: fit-content;
     align-self: center;
@@ -110,6 +110,16 @@
 }
 
 #dropdownText {
+   /* margin-top: .15em;
+    color: #cccccc;
+
+    margin-right: .1em;
+
+    font-size: x-large;
+    font-weight: 520;
+    user-select: none;*/
+}
+.textOfDropdown{
     margin-top: .15em;
     color: #cccccc;
 

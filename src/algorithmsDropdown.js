@@ -24,20 +24,23 @@ const algorithmsDropdown = () => {
         dropDownActivated = !dropDownActivated;
 
     }
+    function updateDropdownText(newText){
+        document.getElementById("mazeAlgText").textContent = "Algorithm:" + newText;
+    }
 
     return (
 
         <>
             <div onClick={structureDropdown} id={"dropdownDiv"}>
-                <text id={"dropdownText"}>Algorithm:A*</text>
+                <text className={"textOfDropdown"} id={"mazeAlgText"}>Algorithm:A*</text>
                 <img src={dropDown} id={"dropdownImg"}/>
             </div>
             <div className="dropdown-content" id={"secondContent"}>
-                <a className={"link"} href="#">Dijkstra's</a>
-                <a className={"link"} href="#">A*</a>
-                <a className={"link"} href="#">Bidirectional</a>
-                <a className={"link"} href="#">Breadth First*</a>
-                <a className={"link"} href="#">Depth First</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Dijkstra's")}>Dijkstra's</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("A*")}>A*</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Bidirectional")}>Bidirectional</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Breadth First")}>Breadth First*</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Depth Sort")}>Depth First</a>
             </div>
         </>
     );

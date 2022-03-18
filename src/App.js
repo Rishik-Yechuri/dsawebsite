@@ -13,7 +13,7 @@ import dropDown from "./dropdown.png";
 function App() {
   return (
       <div>
-        <ArrayNavBar/>
+        <Navbar/>
       </div>
   );
 }

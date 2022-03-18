@@ -24,17 +24,19 @@ const dropdownComponent = () => {
         dropDownActivated = !dropDownActivated;
 
     }
-
+    function updateDropdownText(newText){
+        document.getElementById("structText").textContent = "Structure:" + newText;
+    }
     return (
 
         <>
             <div onClick={structureDropdown} id={"dropdownDiv"}>
-                <text id={"dropdownText"}>Structure:Maze</text>
+                <text className={"textOfDropdown"} id={"structText"}>Structure:Maze</text>
                 <img src={dropDown} id={"dropdownImg"}/>
             </div>
             <div className="dropdown-content" id={"firstContent"}>
-                <a className={"link"} href="#">Maze</a>
-                <a className={"link"} href="#">Array</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Maze")}>Maze</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Array")}>Array</a>
             </div>
         </>
     );
