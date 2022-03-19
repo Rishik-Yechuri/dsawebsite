@@ -9,7 +9,7 @@ import AlgorithmsDropdown from "./algorithmsDropdown";
 const navbar = () => {
     var links = ["Maze","Array"];
     return (
-        <div className={"topBar"}>
+        <div className={"topBar"} id={"navBarTop"}>
             <div className={"halfDiv"} id={"topDiv"}>
                 <div className="dropdown" id={"dropdownTop"}>
                     <DropdownComponent/>

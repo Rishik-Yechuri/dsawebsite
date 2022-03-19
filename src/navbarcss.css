@@ -1,5 +1,9 @@
 .topBar {
+    width:100%;
     background-color: #666666;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .divider {
@@ -66,6 +70,16 @@
     max-height: 2.25em;
     margin-left: 0em;
 }
+.structureDropdown{
+    margin-top: .15em;
+    color: #cccccc;
+
+    margin-right: .1em;
+
+    font-size: x-large;
+    font-weight: 520;
+    user-select: none;
+}
 
 #sizeInput {
     margin-left: 1.3em;
@@ -83,7 +97,8 @@
     outline: none;
     color: #cccccc;
 }
-
+#arrayNavBarTop{
+}
 #createButton {
 
 }
@@ -119,6 +134,7 @@
     font-weight: 520;
     user-select: none;*/
 }
+
 .textOfDropdown{
     margin-top: .15em;
     color: #cccccc;

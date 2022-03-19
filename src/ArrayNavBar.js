@@ -5,7 +5,7 @@ import ArrayAlgorithmComponent from "./ArrayAlgorithmComponent";
 
 const ArrayNavBar = () => {
     return (
-        <div className={"topBar"}>
+        <div className={"topBar"} id={"arrayNavBarTop"}>
             <div className={"halfDiv"} id={"topDiv"}>
                 <div className={"spaceDiv"}></div>
                 <div className={"dropdown2"}>
