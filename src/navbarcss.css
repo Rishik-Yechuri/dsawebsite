@@ -1,9 +1,9 @@
 .topBar {
     width:100%;
     background-color: #666666;
-    position: absolute;
+   /* position: absolute;
     top: 0;
-    left: 0;
+    left: 0;*/
 }
 
 .divider {
@@ -20,7 +20,6 @@
 
 .halfDiv {
     height: 2.25em;
-
 }
 
 #topDiv {
@@ -98,6 +97,7 @@
     color: #cccccc;
 }
 #arrayNavBarTop{
+    display: none;
 }
 #createButton {
 
@@ -207,4 +207,9 @@
     flex-direction: row;
     display: flex;
     align-items: center;
+}
+#veryTopDiv{
+    height:fit-content;
+    width: fit-content;
+    background-color:#8919AB;
 }

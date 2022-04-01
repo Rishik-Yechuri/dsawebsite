@@ -19,7 +19,6 @@ const dropdownComponent = () => {
         }
     })
     function structureDropdown() {
-        alert("here 2");
         var holdDropdowns = document.getElementsByClassName("majorDropdown");
         if (dropDownActivated) {
             for(var x=0;x<holdDropdowns.length;x++){
@@ -39,7 +38,6 @@ const dropdownComponent = () => {
 
     }
     function updateDropdownText(newText){
-        alert("here");
         //alert(document.getElementsByClassName("structureDropdown"));
         var elements = document.getElementsByClassName("structureDropdown");
         for(var x=0;x<elements.length;x++){

@@ -1,0 +1,33 @@
+#mainDiv{
+    height:100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+#mazeTopDiv {
+    width: 100%;
+    height:100%;
+
+    max-height: 100%;
+    background-color: #61dafb;
+}
+#mazeHolderDiv{
+    width: 75px;
+    height: 75px;
+    background-color: green;
+}
+.innerCell{
+    width: 15px;
+    height: 15px;
+    border-style: solid;
+    border-color:yellow;
+    background-color: red;
+}
+.wideDiv{
+    display: flex;
+}
+html, body, #root, .App {
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+}

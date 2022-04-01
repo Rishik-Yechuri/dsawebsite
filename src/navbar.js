@@ -3,25 +3,32 @@ import './navbarcss.css';
 import DropdownComponent from "./dropdownComponent";
 import startingarrow from "./startingarrow.png";
 import targetnode from "./targetnode.png"
-import  AlgorithmComponent from "./algorithmsDropdown";
+import AlgorithmComponent from "./algorithmsDropdown";
 import AlgorithmsDropdown from "./algorithmsDropdown";
+import {usePrevious} from "react-use";
 
-const navbar = () => {
-    var links = ["Maze","Array"];
+const navbar = (setState) => {
+    const updateLength = (event) =>{
+        alert("here:" + event);
+        const inputVal = event.target.value;
+        alert(inputVal);
+    }
+
     return (
         <div className={"topBar"} id={"navBarTop"}>
             <div className={"halfDiv"} id={"topDiv"}>
                 <div className="dropdown" id={"dropdownTop"}>
                     <DropdownComponent/>
                 </div>
-                <div className="dropdown" >
-                <AlgorithmsDropdown/>
+                <div className="dropdown">
+                    <AlgorithmsDropdown/>
                 </div>
                 <form id={"sizeInput"}>
-                    <input type="text" id={"sizeInputField"} placeholder="Border Length"/>
+                    <input type="text" onChange={ updateLength} id={"sizeInputField"}
+                           placeholder="Border Length"/>
                 </form>
                 <button className={"button"} id={"createButton"}>Visualize</button>
-                <button className={"button"} >Reset</button>
+                <button className={"button"}>Reset</button>
 
             </div>
 
@@ -36,15 +43,15 @@ const navbar = () => {
                     <text className={"itemText"}>Target Node</text>
                 </div>
                 <div className={"itemHolder"}>
-                    <div className={"itemImg"}  id={"visitedNode"}/>
+                    <div className={"itemImg"} id={"visitedNode"}/>
                     <text className={"itemText"}>Visited Node</text>
                 </div>
                 <div className={"itemHolder"}>
-                    <div className={"itemImg"}  id={"finalPath"}/>
+                    <div className={"itemImg"} id={"finalPath"}/>
                     <text className={"itemText"}>Final Path</text>
                 </div>
                 <div className={"itemHolder"}>
-                    <div className={"itemImg"}  id={"wall"}/>
+                    <div className={"itemImg"} id={"wall"}/>
                     <text className={"itemText"}>Wall</text>
                 </div>
             </div>
