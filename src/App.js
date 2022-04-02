@@ -12,11 +12,11 @@ import MazeComponent from "./MazeComponent";
 
 
 function App() {
-    const[state,setState]= useState( 3);
+    const [state,setState]= useState( 4);
     return (
         <div id={"mainDiv"}>
             <ArrayNavBar></ArrayNavBar>
-            <Navbar setState={{setState}}></Navbar>
+            <Navbar setState={setState}></Navbar>
 
             <MazeComponent state={state}></MazeComponent>
         </div>

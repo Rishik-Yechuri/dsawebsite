@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './navbarcss.css';
 import DropdownComponent from "./dropdownComponent";
 import startingarrow from "./startingarrow.png";
@@ -7,11 +7,10 @@ import AlgorithmComponent from "./algorithmsDropdown";
 import AlgorithmsDropdown from "./algorithmsDropdown";
 import {usePrevious} from "react-use";
 
-const navbar = (setState) => {
+const navbar = ({setState}) => {
     const updateLength = (event) =>{
-        alert("here:" + event);
         const inputVal = event.target.value;
-        alert(inputVal);
+        setState(inputVal);
     }
 
     return (
