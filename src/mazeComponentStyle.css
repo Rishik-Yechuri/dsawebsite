@@ -1,33 +1,41 @@
-#mainDiv{
-    height:100%;
+
+
+#mainDiv {
+    height: 100%;
     max-height: 100%;
     display: flex;
     flex-direction: column;
 }
+
 #mazeTopDiv {
     width: 100%;
-    height:100%;
+    height: 100%;
     max-height: 100%;
     background-color: #61dafb;
     display: flex;
     justify-content: center;
 }
-#mazeHolderDiv{
+
+#mazeHolderDiv {
     width: fit-content;
     height: fit-content;
     background-color: green;
+    transform: scale(1);
     margin: auto;
-vertical-align: bottom}
-.innerCell{
+}
+
+.innerCell {
     width: 15px;
     height: 15px;
     border-style: solid;
-    border-color:yellow;
+    border-color: yellow;
     background-color: red;
 }
-.wideDiv{
+
+.wideDiv {
     display: flex;
 }
+
 html, body, #root, .App {
     height: 100%;
     max-height: 100%;

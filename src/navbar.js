@@ -23,7 +23,7 @@ const navbar = ({setState}) => {
                     <AlgorithmsDropdown/>
                 </div>
                 <form id={"sizeInput"}>
-                    <input type="text" onChange={ updateLength} id={"sizeInputField"}
+                    <input type="text" onChange={updateLength} id={"sizeInputField"}
                            placeholder="Border Length"/>
                 </form>
                 <button className={"button"} id={"createButton"}>Visualize</button>
