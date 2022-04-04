@@ -1,21 +1,57 @@
 import React, {useEffect, useState} from 'react';
 import "./mazeComponentStyle.css"
+import Draggable from "react-draggable";
 
+//var mousePosition;
 const MazeComponent = ({state}) => {
-   // var zoomSize = 1.0;
+    //const [mouseDown, setMousedown] = useState(false);
     var gridSize = state;
-    let [zoomSize,setZoomSize]= useState( {zoomSize:1});
+    let [zoomSize, setZoomSize] = useState({zoomSize: 1});
+    var mazeHolderDiv = document.getElementById("mazeHolderDiv");
+    const mousedown = (event) => {
+        /* setMousedown(prevState =>{
+             return{
+                 diffX: event.screenX - event.currentTarget.getBoundingClientRect().left,
+                 diffY: event.screenY - event.currentTarget.getBoundingClientRect().top,
+                 dragging: true
+             }
+         })
+         mouseDown.mouseDown = true;*/
+    }
 
-    var mazeTopDiv = document.getElementById("mazeHolderDiv");
+    const mousemove = (e) => {
+        /*   if(mousedown.dragging){
+               var left =  e.screenX - this.state.diffX;
+               var top = e.screenY - this.state.diffY;
+               setMousedown(prevState => {
+                   return{
+                       styles:{
+                           left:left,
+                           top:top
+                       }
+                   }
+               });
+           }*/
 
-    var zoom = (event) =>{
-       // alert("PRE");
-        event.preventDefault();
-        mazeTopDiv = document.getElementById("mazeHolderDiv");
-        var zoomSpeed = (-.001) * (5.0/Math.sqrt(gridSize));
+    }
+
+    function mouseup() {
+        /*setMousedown(prevState => {
+            return{
+                pre
+               // prevState.dragging: false
+            }
+        });
+        mouseDown.mouseDown = false;*/
+    }
+
+    var zoom = (event) => {
+        //event.preventDefault();
+        mazeHolderDiv = document.getElementById("mazeHolderDiv");
+        var zoomSpeed = (-.001) * (5.0 / Math.sqrt(gridSize));
         var tempZoomSize = zoomSize.zoomSize + (event.deltaY * zoomSpeed);
         zoomSize.zoomSize = Math.min(Math.max(.125, tempZoomSize), 1000000)
-        mazeTopDiv.style.transform = `scale(${zoomSize.zoomSize})`;
+        mazeHolderDiv.style.transform = `scale(${zoomSize.zoomSize})`;
     }
     useEffect(() => {
         createMaze(state);
@@ -42,9 +78,13 @@ const MazeComponent = ({state}) => {
     }
 
     return (
-        <div id={"mazeTopDiv"} onWheel={zoom} >
-            <div id={"mazeHolderDiv"}>
-            </div>
+        <div id={"mazeTopDiv"} onWheel={zoom} onMouseUp={mouseup}>
+            <Draggable>
+                <div id={"wrapperDiv"}>
+                    <div id={"mazeHolderDiv"}>
+                    </div>
+                </div>
+            </Draggable>
         </div>
     );
 }
