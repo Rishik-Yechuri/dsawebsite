@@ -1,50 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import "./mazeComponentStyle.css"
 import Draggable from "react-draggable";
 
-//var mousePosition;
 const MazeComponent = ({state}) => {
-    //const [mouseDown, setMousedown] = useState(false);
+    var holdPopups = document.getElementsByClassName("popUpContent");
+    document.addEventListener('readystatechange', event => {
+        if (event.target.readyState === "complete") {
+            popupLoaded();
+        }
+    });
     var gridSize = state;
     let [zoomSize, setZoomSize] = useState({zoomSize: 1});
     var mazeHolderDiv = document.getElementById("mazeHolderDiv");
-    const mousedown = (event) => {
-        /* setMousedown(prevState =>{
-             return{
-                 diffX: event.screenX - event.currentTarget.getBoundingClientRect().left,
-                 diffY: event.screenY - event.currentTarget.getBoundingClientRect().top,
-                 dragging: true
-             }
-         })
-         mouseDown.mouseDown = true;*/
-    }
-
-    const mousemove = (e) => {
-        /*   if(mousedown.dragging){
-               var left =  e.screenX - this.state.diffX;
-               var top = e.screenY - this.state.diffY;
-               setMousedown(prevState => {
-                   return{
-                       styles:{
-                           left:left,
-                           top:top
-                       }
-                   }
-               });
-           }*/
-
-    }
-
-    function mouseup() {
-        /*setMousedown(prevState => {
-            return{
-                pre
-               // prevState.dragging: false
-            }
-        });
-        mouseDown.mouseDown = false;*/
-    }
-
     var zoom = (event) => {
         //event.preventDefault();
         mazeHolderDiv = document.getElementById("mazeHolderDiv");
@@ -56,6 +23,19 @@ const MazeComponent = ({state}) => {
     useEffect(() => {
         createMaze(state);
     }, [state]);
+
+    function popupLoaded() {
+        if (localStorage.getItem("popupclosed") !== "yes") {
+            document.getElementById("initialPopup").style.display = "block";
+        }
+    }
+
+    function closeButtonClicked() {
+        for (var x = 0; x < holdPopups.length; x++) {
+            holdPopups[x].style.display = "none";
+        }
+        localStorage.setItem("popupclosed", "yes");
+    }
 
     function createMaze(length) {
         gridSize = length;
@@ -78,13 +58,24 @@ const MazeComponent = ({state}) => {
     }
 
     return (
-        <div id={"mazeTopDiv"} onWheel={zoom} onMouseUp={mouseup}>
+        <div id={"mazeTopDiv"} onWheel={zoom}>
             <Draggable>
                 <div id={"wrapperDiv"}>
                     <div id={"mazeHolderDiv"}>
                     </div>
                 </div>
             </Draggable>
+
+            <div className={"popUpContent"} id={"initialPopup"}>
+                <div id={"popUpInner"}>
+                    <text className={"popUpText"}>Left clicking a empty square will place a wall. The Starting Node and
+                        Target Node can be dragged around.
+                    </text>
+                </div>
+                <div id={"lowerPopUpDiv"}>
+                    <button id={"closeButton"} onClick={closeButtonClicked}>Ok</button>
+                </div>
+            </div>
         </div>
     );
 }

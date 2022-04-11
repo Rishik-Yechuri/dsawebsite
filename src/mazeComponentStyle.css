@@ -1,4 +1,3 @@
-
 #mainDiv {
     height: 100%;
     max-height: 100%;
@@ -21,12 +20,13 @@
     height: fit-content;
     background-color: green;
     transform: scale(1);
+}
+
+#wrapperDiv {
     align-self: center;
 }
-#wrapperDiv{
-    align-self: center;
-}
-Draggable{
+
+Draggable {
     width: fit-content;
     height: fit-content;
 }
@@ -38,6 +38,52 @@ Draggable{
     border-color: yellow;
     background-color: red;
     align-self: center;
+}
+
+/*.popUp{
+    position: absolute;
+    align-self: center;
+}*/
+.popUpContent {
+    width: 22em;
+    height: 30em;
+    background-color: #8919AB;
+    position: absolute;
+    z-index: 10;
+    vertical-align: center;
+    align-self: center;
+    horiz-align: center;
+    display: none;
+}
+
+.popUpText {
+    overflow-wrap: break-word;
+}
+
+#popUpInner {
+    background-color: orangered;
+    height: 24em;
+    width: 18em;
+    margin: 2em;
+    margin-bottom: 1.3em;
+}
+
+#closeButton {
+    background-color: #333333;
+    border-style: solid;
+    height: 2.5em;
+    width: 6em;
+    border-radius: .8em;
+    color: white;
+}
+
+#lowerPopUpDiv {
+    width: available;
+    vertical-align: center;
+    align-self: center;
+    horiz-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .wideDiv {
