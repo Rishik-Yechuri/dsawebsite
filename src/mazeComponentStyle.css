@@ -32,18 +32,17 @@ Draggable {
 }
 
 .innerCell {
-    width: .95em;
-    height: .95em;
+    width: 2.95em;
+    height: 2.95em;
     border-style: solid;
     border-color: yellow;
     background-color: red;
     align-self: center;
+    transition: all 0.4s ease;
 }
-
-/*.popUp{
-    position: absolute;
-    align-self: center;
-}*/
+.innerCell:hover{
+    background-color: black;
+}
 .popUpContent {
     width: 22em;
     height: 30em;

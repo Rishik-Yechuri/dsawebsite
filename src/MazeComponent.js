@@ -3,6 +3,7 @@ import "./mazeComponentStyle.css"
 import Draggable from "react-draggable";
 
 const MazeComponent = ({state}) => {
+    var arr = new Array(4); // create an empty array of length n
     var holdPopups = document.getElementsByClassName("popUpContent");
     document.addEventListener('readystatechange', event => {
         if (event.target.readyState === "complete") {
@@ -23,11 +24,29 @@ const MazeComponent = ({state}) => {
     useEffect(() => {
         createMaze(state);
     }, [state]);
+    function setPointValue(yCoord,xCoord,newVal){
+        arr[yCoord][xCoord] = newVal;
+        var idName = "innerCell" + yCoord + "X" + xCoord;
+        var innerCell = document.getElementById(idName);
+        if(newVal === "WALL"){
+            innerCell.style.backgroundColor = "#FFFFFF";
+        }else if(newVal === "END"){
 
+        }else if(newVal === "START"){
+            //innerCell.style.backgroundColor = "#FFFFFF";
+        }else if(newVal === "WALL"){
+            innerCell.style.backgroundColor = "#FFFFFF";
+        }else if(newVal === "PATH"){
+            innerCell.style.backgroundColor = "#FFFFFF";
+        }else if(newVal === "FINALPATH"){
+            innerCell.style.backgroundColor = "#FFFFFF";
+        }
+    }
     function popupLoaded() {
         if (localStorage.getItem("popupclosed") !== "yes") {
             document.getElementById("initialPopup").style.display = "block";
         }
+        setPointValue(0,0,"WALL");
     }
 
     function closeButtonClicked() {
@@ -39,6 +58,10 @@ const MazeComponent = ({state}) => {
 
     function createMaze(length) {
         gridSize = length;
+        arr = new Array(length);
+        for (var i = 0; i < length; i++) {
+            arr[i] = new Array(length);
+        }
         const parent = document.getElementById("mazeHolderDiv");
         while (parent.firstChild) {
             parent.firstChild.remove()
@@ -49,7 +72,7 @@ const MazeComponent = ({state}) => {
             element.className = "wideDiv";
             for (var x = 0; x < length; x++) {
                 var insideElement = document.createElement("div");
-                insideElement.id = "innerCell" + x;
+                insideElement.id = "innerCell" + y + "X"+ x;
                 insideElement.className = "innerCell";
                 element.appendChild(insideElement);
             }
