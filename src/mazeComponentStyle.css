@@ -18,7 +18,7 @@
 #mazeHolderDiv {
     width: fit-content;
     height: fit-content;
-    background-color: green;
+ /*   background-color: green;*/
     transform: scale(1);
 }
 
@@ -36,12 +36,19 @@ Draggable {
     height: 2.95em;
     border-style: solid;
     border-color: yellow;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 70%;
     background-color: red;
     align-self: center;
+    align-items: center;
+    display: flex;
+    horiz-align: center;
+    justify-content: center;
     transition: all 0.4s ease;
 }
 .innerCell:hover{
-    background-color: black;
+    background-color: darkred;
 }
 .popUpContent {
     width: 22em;
