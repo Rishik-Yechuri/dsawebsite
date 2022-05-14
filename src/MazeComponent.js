@@ -5,14 +5,18 @@ import startingarrow from "./startingarrow.png";
 import targetnode from "./targetnode.png"
 
 const MazeComponent = ({state}) => {
+    var lastGoodY;
+    var lastGoodX;
     var mouseDown = 0;
+    var draggingItemMode = false;
+    var itemBeingDragged = null;
     window.addEventListener('mousedown', (event) => {
-        if(event.button === 2){
+        if (event.button === 2) {
             mouseDown = 1;
         }
     });
     window.addEventListener('mouseup', (event) => {
-        if(event.button === 2){
+        if (event.button === 2) {
             mouseDown = 0;
         }
     });
@@ -27,11 +31,10 @@ const MazeComponent = ({state}) => {
     let [zoomSize, setZoomSize] = useState({zoomSize: 1});
     var mazeHolderDiv = document.getElementById("mazeHolderDiv");
     var zoom = (event) => {
-        //event.preventDefault();
         mazeHolderDiv = document.getElementById("mazeHolderDiv");
         var zoomSpeed = (-.001) * (5.0 / Math.sqrt(gridSize));
         var tempZoomSize = zoomSize.zoomSize + (event.deltaY * zoomSpeed);
-        zoomSize.zoomSize = Math.min(Math.max(.125, tempZoomSize), 1000000)
+        zoomSize.zoomSize = Math.min(Math.max(.1, tempZoomSize), 1000000)
         mazeHolderDiv.style.transform = `scale(${zoomSize.zoomSize})`;
     }
     useEffect(() => {
@@ -39,34 +42,48 @@ const MazeComponent = ({state}) => {
     }, [state]);
 
     function setPointValue(yCoord, xCoord, newVal) {
-        arr[yCoord][xCoord] = newVal;
+
+        var environmentUpdated = true;
         var idName = "innerCell" + yCoord + "X" + xCoord;
         var imgId = "innerCell" + yCoord + "X" + xCoord + "I";
         var innerCell = document.getElementById(idName);
         var innerImg = document.getElementById(imgId);
-        arr[yCoord][xCoord] = newVal;
         if (newVal === "END") {
             innerCell.style.backgroundColor = "red";
             innerImg.src = targetnode;
             innerImg.style.display = 'block';
+            innerImg.style.width = '65%';
+
         } else if (newVal === "START") {
             innerCell.style.backgroundColor = "red";
             innerImg.src = startingarrow;
             innerImg.style.display = 'block';
-        } else if (newVal === "WALL") {
-            innerCell.style.backgroundColor = "#000000";
-        } else if (newVal === "PATH") {
-            innerCell.style.backgroundColor = "yellow";
-        } else if (newVal === "FINALPATH") {
-            innerCell.style.backgroundColor = "lawngreen";
-        }else{
-            innerCell.style.backgroundColor = "red";
+            innerImg.style.width = '60%';
+        } else if (arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START" || newVal === "EMPTY") {
+
             innerImg.style.display = 'none';
+            if (newVal === "WALL") {
+                innerCell.style.backgroundColor = "#000000";
+            } else if (newVal === "PATH") {
+                innerCell.style.backgroundColor = "yellow";
+            } else if (newVal === "FINALPATH") {
+                innerCell.style.backgroundColor = "lawngreen";
+            } else {
+                innerCell.style.backgroundColor = "red";
+                innerImg.style.display = 'none';
+            }
+        } else {
+            environmentUpdated = false;
+        }
+        if (environmentUpdated) {
+            arr[yCoord][xCoord] = newVal;
         }
     }
-    function getPointValue(yCoord,xCoord){
+
+    function getPointValue(yCoord, xCoord) {
         return arr[yCoord][xCoord];
     }
+
     function popupLoaded() {
         if (localStorage.getItem("popupclosed") !== "yes") {
             document.getElementById("initialPopup").style.display = "block";
@@ -80,12 +97,21 @@ const MazeComponent = ({state}) => {
         }
         localStorage.setItem("popupclosed", "yes");
     }
-    function changeTile(ev){
-        var holdLoc = ev.target.id.split('innerCell')[1].split('X');
-        setPointValue(holdLoc[0],holdLoc[1],"WALL");
+
+    function changeTile(ev) {
+        var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+        setPointValue(holdLoc[0], holdLoc[1], "WALL");
     }
+
     function createMaze(length) {
+        if(length <= 1){
+            return;
+        }
         gridSize = length;
+        var yLocOfStart = 0;
+        if (length > 0) {
+            yLocOfStart = parseInt(length / 2, 10);
+        }
         arr = new Array(length);
         for (var i = 0; i < length; i++) {
             arr[i] = new Array(length);
@@ -102,17 +128,81 @@ const MazeComponent = ({state}) => {
                 var insideElement = document.createElement("div");
                 insideElement.id = "innerCell" + y + "X" + x;
                 insideElement.className = "innerCell";
-                insideElement.onmouseenter  = (ev) => {
-                  if(mouseDown === 1){
-                      changeTile(ev)
-                      /*var holdLoc = ev.target.id.split('innerCell')[1].split('X');
-                      setPointValue(holdLoc[0],holdLoc[1],"FINALPATH");
-                      //alert("DOWN");*/
-                  }
+                insideElement.onmouseenter = (ev) => {
+                    if (mouseDown === 1) {
+                        if (draggingItemMode) {
+                            var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                            var imgId;
+                            if ((arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END")) {
+                                holdLoc[0] = lastGoodY;
+                                holdLoc[1] = lastGoodX;
+                            } else {
+                                ev.target.style.backgroundColor = "orange";
+                            }
+                            imgId = "innerCell" + holdLoc[0] + "X" + holdLoc[1] + "I";
+                            var innerImg = document.getElementById(imgId);
+                            if (itemBeingDragged === "START") {
+                                innerImg.src = startingarrow;
+                                innerImg.style.width = '60%';
+                            } else if (itemBeingDragged === "END") {
+                                innerImg.src = targetnode;
+                                innerImg.style.width = '65%';
+                            }
+                            innerImg.style.display = 'block';
+                        } else {
+                            changeTile(ev)
+                        }
+                    }
                 }
-                insideElement.onmousedown = e =>{
-                    if(e.button === 2){
-                        changeTile(e);
+                insideElement.onmouseleave = (ev) => {
+                    if (mouseDown === 1) {
+                        if (draggingItemMode) {
+                            var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                            if ((itemBeingDragged === "START" && arr[holdLoc[0]][holdLoc[1]] !== "END") || (itemBeingDragged === "END" && arr[holdLoc[0]][holdLoc[1]] !== "START")) {
+                                if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
+                                    setPointValue(holdLoc[0], holdLoc[1], "EMPTY");
+                                } else {
+                                    setPointValue(holdLoc[0], holdLoc[1], arr[holdLoc[0]][holdLoc[1]]);
+                                }
+                                lastGoodY = holdLoc[0];
+                                lastGoodX = holdLoc[1];
+                            } else {
+                                setPointValue(lastGoodY, lastGoodX, arr[lastGoodY][lastGoodX]);
+                            }
+                        }
+                    }
+                }
+                insideElement.onmousedown = e => {
+                    if (e.button === 2) {
+                        var holdLoc = e.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                        if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
+                            draggingItemMode = true;
+                            if (arr[holdLoc[0]][holdLoc[1]] === "START") {
+                                itemBeingDragged = "START";
+                            } else if (arr[holdLoc[0]][holdLoc[1]]) {
+                                itemBeingDragged = "END";
+                            }
+                        } else {
+                            changeTile(e);
+                        }
+                    }
+                }
+                insideElement.onmouseup = e => {
+                    if (e.button === 2) {
+                        if (draggingItemMode) {
+                            var holdLoc = e.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                            if ((arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END")) {
+                                holdLoc[0] = lastGoodY;
+                                holdLoc[1] = lastGoodX;
+                            }
+                            if (itemBeingDragged === "START") {
+                                setPointValue(holdLoc[0], holdLoc[1], "START");
+                            } else if (itemBeingDragged === "END") {
+                                setPointValue(holdLoc[0], holdLoc[1], "END");
+                            }
+                            itemBeingDragged = "";
+                            draggingItemMode = false;
+                        }
                     }
                 }
                 var insideImg = document.createElement("img");
@@ -120,14 +210,22 @@ const MazeComponent = ({state}) => {
                 insideImg.style.position = 'center';
                 insideImg.id = "innerCell" + y + "X" + x + "I";
                 insideImg.style.display = 'none';
-                //insideImg.style.height = '100%';
                 insideImg.src = startingarrow;
                 insideElement.appendChild(insideImg);
                 element.appendChild(insideElement);
             }
             document.getElementById("mazeHolderDiv").appendChild(element);
         }
+        if (length > 1) {
+            setPointValue(yLocOfStart, 0, "START");
+            var xLocOfStart = length - 2;
+            if (length < 3) {
+                xLocOfStart = length - 1;
+            }
+            setPointValue(yLocOfStart, xLocOfStart, "END");
+        }
     }
+
     var rejectModernity = (event) => {
         event.preventDefault();
         return false;
@@ -154,5 +252,4 @@ const MazeComponent = ({state}) => {
         </div>
     );
 }
-
 export default MazeComponent;
