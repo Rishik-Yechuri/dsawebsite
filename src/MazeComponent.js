@@ -1,15 +1,26 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import "./mazeComponentStyle.css"
 import Draggable from "react-draggable";
 import startingarrow from "./startingarrow.png";
 import targetnode from "./targetnode.png"
+import Cookies from 'universal-cookie';
 
-const MazeComponent = ({state}) => {
+
+const MazeComponent = ({state, algoState, buttonState,setState}) => {
     var lastGoodY;
     var lastGoodX;
     var mouseDown = 0;
     var draggingItemMode = false;
     var itemBeingDragged = null;
+    //var startPointY = 0;
+    const [startPointYState,setStartPointYState]= useState( 0);
+    //var startPointX = 0;
+    const [startPointXState,setStartPointXState]= useState( 0);
+    //var endPointY = 0;
+    const [endPointYState,setEndPointYState]= useState( 0);
+    //var endPointX = 0;
+    const [endPointXState,setEndPointXState]= useState( 0);
+    let arr = JSON.parse(localStorage.getItem("arr"));
     window.addEventListener('mousedown', (event) => {
         if (event.button === 2) {
             mouseDown = 1;
@@ -20,7 +31,17 @@ const MazeComponent = ({state}) => {
             mouseDown = 0;
         }
     });
-    var arr = new Array(4); // create an empty array of length n
+    //alert(arr);
+ /*   if(arr == null || (arr!=null && arr[0].length <= 1)){
+        for(var x=0; x<4; x++){
+            //alert("Xval:" + x);
+           /!* var arrayToInsert = new Array(4);
+            arrayToInsert.fill("EMPTY");
+            //alert("To Insert:" + arrayToInsert);
+            arr[x] = arrayToInsert;*!/
+        }
+    }*/
+    localStorage.setItem("arr",JSON.stringify(arr));
     var holdPopups = document.getElementsByClassName("popUpContent");
     document.addEventListener('readystatechange', event => {
         if (event.target.readyState === "complete") {
@@ -38,11 +59,109 @@ const MazeComponent = ({state}) => {
         mazeHolderDiv.style.transform = `scale(${zoomSize.zoomSize})`;
     }
     useEffect(() => {
-        createMaze(state);
+        arr = JSON.parse(localStorage.getItem("arr"));
+        if(state > 1){
+            createMaze(state)
+        }else{
+            createMaze(arr.length)
+        }
     }, [state]);
+    useEffect(() => {
+    }, [algoState]);
+    useEffect(() => {
+        if (buttonState > 0) {
+            startSearching();
+        }
+    }, [buttonState]);
+
+    function startSearching() {
+        var holdState = algoState.toString();
+        if (holdState === "A*") {
+            arr = JSON.parse(localStorage.getItem("arr"));
+            aStar(arr,startPointYState,startPointXState,endPointYState,endPointXState);
+        } else {
+        }
+    }
+    class Queue {
+        constructor() {
+            this.elements = {};
+            this.head = 0;
+            this.tail = 0;
+        }
+        enqueue(element) {
+            this.elements[this.tail] = element;
+            this.tail++;
+        }
+        dequeue() {
+            const item = this.elements[this.head];
+            delete this.elements[this.head];
+            this.head++;
+            return item;
+        }
+        peek() {
+            return this.elements[this.head];
+        }
+        get length() {
+            return this.tail - this.head;
+        }
+         isEmpty() {
+            return this.length === 0;
+        }
+    }
+    const aStar = (grid, startY,startX, finishY,finishX) => {
+        const n = grid.length;
+        const visitedNodesInOrder = [];
+        const queue = new Queue();
+        var thingToEnqueue = (startY.toString()+","+startX.toString()).toString();
+        queue.enqueue(thingToEnqueue);
+        while(!queue.isEmpty()){
+            var locString = queue.dequeue();
+            var yCoord = locString.split(",")[0];
+            var xCoord = locString.split(",")[1];
+            getPointValue(2,0);
+            if(getPointValue(yCoord,xCoord) === "PATH"){
+                continue;
+            }
+
+            if (yCoord === finishY && xCoord === finishX) {
+                visitedNodesInOrder.push(yCoord+","+xCoord);
+                setPointValue(yCoord,xCoord,"PATH")
+                break;
+            }
+
+            if (grid[yCoord][xCoord] === "WALL") {
+                continue;
+            }
+
+            if (yCoord < n - 1) {
+                queue.enqueue((yCoord+1)+","+xCoord);
+            }
+
+            if (yCoord > 0) {
+                queue.enqueue((yCoord-1)+","+xCoord);
+            }
+
+            if (xCoord < n - 1) {
+                queue.enqueue(yCoord+","+(xCoord+1));
+            }
+
+            if (xCoord > 0) {
+                queue.enqueue(yCoord+","+(xCoord-1));
+            }
+
+            if (grid[yCoord][xCoord] === "EMPTY") {
+                visitedNodesInOrder.push(yCoord+","+xCoord);
+                grid[yCoord][xCoord] = "PATH";
+                setPointValue(yCoord,xCoord,"PATH")
+            }
+
+        }
+        localStorage.setItem("arr",JSON.stringify(arr));
+        return visitedNodesInOrder
+    };
 
     function setPointValue(yCoord, xCoord, newVal) {
-
+        arr = JSON.parse(localStorage.getItem("arr"));
         var environmentUpdated = true;
         var idName = "innerCell" + yCoord + "X" + xCoord;
         var imgId = "innerCell" + yCoord + "X" + xCoord + "I";
@@ -53,14 +172,16 @@ const MazeComponent = ({state}) => {
             innerImg.src = targetnode;
             innerImg.style.display = 'block';
             innerImg.style.width = '65%';
-
+            setEndPointYState(yCoord);
+            setEndPointXState(xCoord);
         } else if (newVal === "START") {
             innerCell.style.backgroundColor = "red";
             innerImg.src = startingarrow;
             innerImg.style.display = 'block';
             innerImg.style.width = '60%';
+            setStartPointYState(yCoord);
+            setStartPointXState(xCoord);
         } else if (arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START" || newVal === "EMPTY") {
-
             innerImg.style.display = 'none';
             if (newVal === "WALL") {
                 innerCell.style.backgroundColor = "#000000";
@@ -69,7 +190,7 @@ const MazeComponent = ({state}) => {
             } else if (newVal === "FINALPATH") {
                 innerCell.style.backgroundColor = "lawngreen";
             } else {
-                innerCell.style.backgroundColor = "red";
+                //innerCell.style.backgroundColor = "red";
                 innerImg.style.display = 'none';
             }
         } else {
@@ -78,9 +199,11 @@ const MazeComponent = ({state}) => {
         if (environmentUpdated) {
             arr[yCoord][xCoord] = newVal;
         }
+        localStorage.setItem("arr",JSON.stringify(arr));
     }
 
     function getPointValue(yCoord, xCoord) {
+        arr = JSON.parse(localStorage.getItem("arr"));
         return arr[yCoord][xCoord];
     }
 
@@ -88,7 +211,6 @@ const MazeComponent = ({state}) => {
         if (localStorage.getItem("popupclosed") !== "yes") {
             document.getElementById("initialPopup").style.display = "block";
         }
-        setPointValue(0, 0, "FINALPATH");
     }
 
     function closeButtonClicked() {
@@ -104,17 +226,30 @@ const MazeComponent = ({state}) => {
     }
 
     function createMaze(length) {
-        if(length <= 1){
+        //alert()
+        var arrayDiffSize = false;
+        arr = JSON.parse(localStorage.getItem("arr"));
+        if(arr == null || length !== arr.length ){
+            arrayDiffSize = true;
+            localStorage.setItem("mainpoints",JSON.stringify(false));
+            var newArr = new Array(length);
+            for (var i = 0; i < length; i++) {
+                var arrayToInsert = new Array(length);
+                for(var q=0;q<length;q++){
+                    arrayToInsert[q] = "EMPTY";
+                }
+                newArr[i] = arrayToInsert;
+            }
+            localStorage.setItem("arr",JSON.stringify(newArr));
+            arr = JSON.parse(localStorage.getItem("arr"));
+        }
+        if (length <= 1) {
             return;
         }
         gridSize = length;
         var yLocOfStart = 0;
         if (length > 0) {
             yLocOfStart = parseInt(length / 2, 10);
-        }
-        arr = new Array(length);
-        for (var i = 0; i < length; i++) {
-            arr[i] = new Array(length);
         }
         const parent = document.getElementById("mazeHolderDiv");
         while (parent.firstChild) {
@@ -153,6 +288,7 @@ const MazeComponent = ({state}) => {
                             changeTile(ev)
                         }
                     }
+                    localStorage.setItem("arr",JSON.stringify(arr));
                 }
                 insideElement.onmouseleave = (ev) => {
                     if (mouseDown === 1) {
@@ -171,6 +307,7 @@ const MazeComponent = ({state}) => {
                             }
                         }
                     }
+                    localStorage.setItem("arr",JSON.stringify(arr));
                 }
                 insideElement.onmousedown = e => {
                     if (e.button === 2) {
@@ -186,6 +323,7 @@ const MazeComponent = ({state}) => {
                             changeTile(e);
                         }
                     }
+                    localStorage.setItem("arr",JSON.stringify(arr));
                 }
                 insideElement.onmouseup = e => {
                     if (e.button === 2) {
@@ -213,16 +351,39 @@ const MazeComponent = ({state}) => {
                 insideImg.src = startingarrow;
                 insideElement.appendChild(insideImg);
                 element.appendChild(insideElement);
+                //setPointValue(y,x,arr[y][x]);
             }
             document.getElementById("mazeHolderDiv").appendChild(element);
         }
-        if (length > 1) {
+        localStorage.setItem("arr",JSON.stringify(arr));
+        if(!arrayDiffSize){
+            for(y=0;y<length;y++){
+                for(x=0;x<length;x++){
+                    setPointValue(y,x,arr[y][x]);
+                }
+            }
+        }else{
+            for(y=0;y<length;y++){
+                for(x=0;x<length;x++){
+                    setPointValue(y,x,"EMPTY");
+                }
+
+            }
+        }
+        //alert("here");
+        var mainPointsExist = localStorage.getItem("mainpoints") === 'true';
+        if (length > 1 && !mainPointsExist) {
             setPointValue(yLocOfStart, 0, "START");
+            setStartPointYState(yLocOfStart); //= yLocOfStart;
+            setStartPointXState(0);
             var xLocOfStart = length - 2;
             if (length < 3) {
                 xLocOfStart = length - 1;
             }
+            setEndPointYState(yLocOfStart);
+            setEndPointXState(xLocOfStart);
             setPointValue(yLocOfStart, xLocOfStart, "END");
+            localStorage.setItem("mainpoints",JSON.stringify(true));
         }
     }
 
@@ -231,6 +392,7 @@ const MazeComponent = ({state}) => {
         return false;
     }
     return (
+
         <div id={"mazeTopDiv"} onWheel={zoom}>
             <Draggable oncontextmenu={rejectModernity}>
                 <div id={"wrapperDiv"} onContextMenu={rejectModernity}>

@@ -7,12 +7,14 @@ import AlgorithmComponent from "./algorithmsDropdown";
 import AlgorithmsDropdown from "./algorithmsDropdown";
 import {usePrevious} from "react-use";
 
-const navbar = ({setState}) => {
+const navbar = ({setState,setAlgoState,setButtonState,buttonState}) => {
     const updateLength = (event) =>{
         const inputVal = event.target.value;
         setState(inputVal);
     }
-
+    const updateButtonState = (event) => {
+        setButtonState(buttonState+1);
+    }
     return (
         <div className={"topBar"} id={"navBarTop"}>
             <div className={"halfDiv"} id={"topDiv"}>
@@ -20,13 +22,13 @@ const navbar = ({setState}) => {
                     <DropdownComponent/>
                 </div>
                 <div className="dropdown">
-                    <AlgorithmsDropdown/>
+                    <AlgorithmsDropdown setAlgoState={setAlgoState}/>
                 </div>
                 <form id={"sizeInput"}>
                     <input type="text" onChange={updateLength} id={"sizeInputField"}
                            placeholder="Border Length"/>
                 </form>
-                <button className={"button"} id={"createButton"}>Visualize</button>
+                <button onClick={updateButtonState} className={"button"} id={"createButton"}>Visualize</button>
                 <button className={"button"}>Reset</button>
 
             </div>

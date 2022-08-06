@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import dropDown from "./dropdown.png";
 import './navbarcss.css';
 
 
 
-const algorithmsDropdown = () => {
+const algorithmsDropdown = ({setState,setAlgoState}) => {
+    var currentAlgo = "A*";
     var dropDownActivated = false;
     document.addEventListener("click",function (event){
         if(event.target.closest("#dropdownDiv")){
@@ -26,6 +27,8 @@ const algorithmsDropdown = () => {
     }
     function updateDropdownText(newText){
         document.getElementById("mazeAlgText").textContent = "Algorithm:" + newText;
+        //currentAlgo = newText;
+        setAlgoState(newText);
     }
 
     return (
@@ -36,7 +39,9 @@ const algorithmsDropdown = () => {
                 <img src={dropDown} id={"dropdownImg"}/>
             </div>
             <div className="dropdown-content" id={"secondContent"}>
+{/*
                 <a className={"link"} href="#" onClick={() => updateDropdownText("Dijkstra's")}>Dijkstra's</a>
+*/}
                 <a className={"link"} href="#" onClick={() => updateDropdownText("A*")}>A*</a>
                 <a className={"link"} href="#" onClick={() => updateDropdownText("Bidirectional")}>Bidirectional</a>
                 <a className={"link"} href="#" onClick={() => updateDropdownText("Breadth First")}>Breadth First*</a>

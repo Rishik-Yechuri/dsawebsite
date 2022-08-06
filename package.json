@@ -17,6 +17,7 @@
     "react-scripts": "5.0.0",
     "react-scroll-wheel-handler": "^2.1.0",
     "react-use": "^17.3.2",
+    "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

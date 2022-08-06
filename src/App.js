@@ -11,14 +11,22 @@ import dropDown from "./dropdown.png";
 import MazeComponent from "./MazeComponent";
 
 
+
 function App() {
-    const [state,setState]= useState( 4);
+   /* var arr = JSON.parse(localStorage.getItem("arr"));
+    var tempLen = arr.length
+    if(arr.length > 1){
+        const [state,setState] = useState(4);
+    }*/
+    const [state,setState] = useState(0);
+    const [algoState,setAlgoState]= useState( "A*");
+    const [buttonState,setButtonState]= useState( 0);
     return (
         <div id={"mainDiv"}>
             <ArrayNavBar></ArrayNavBar>
-            <Navbar setState={setState}></Navbar>
+            <Navbar setState={setState} setAlgoState={setAlgoState} setButtonState={setButtonState} buttonState={buttonState}></Navbar>
 
-            <MazeComponent state={state}></MazeComponent>
+            <MazeComponent state={state} algoState={algoState} buttonState={buttonState} setState={setState}></MazeComponent>
         </div>
     );
 }

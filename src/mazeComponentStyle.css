@@ -50,6 +50,7 @@ Draggable {
 .innerCell:hover{
     background-color: darkred;
 }
+
 .popUpContent {
     width: 22em;
     height: 30em;
