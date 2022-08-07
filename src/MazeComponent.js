@@ -49,6 +49,15 @@ const MazeComponent = ({state, algoState, buttonState,setState}) => {
         }
     });
     var gridSize = state;
+    arr = JSON.parse(localStorage.getItem("arr"));
+    gridSize = arr.length
+    //alert(arr.length);
+    /*if(state > 1){
+        gridSize = this.state;
+        //createMaze(state)
+    }else{
+        gridSize = arr.size;
+    }*/
     let [zoomSize, setZoomSize] = useState({zoomSize: 1});
     var mazeHolderDiv = document.getElementById("mazeHolderDiv");
     var zoom = (event) => {
@@ -62,7 +71,9 @@ const MazeComponent = ({state, algoState, buttonState,setState}) => {
         arr = JSON.parse(localStorage.getItem("arr"));
         if(state > 1){
             createMaze(state)
+            //gridSize = state;
         }else{
+            //gridSize = arr.length;
             createMaze(arr.length)
         }
     }, [state]);
@@ -190,7 +201,7 @@ const MazeComponent = ({state, algoState, buttonState,setState}) => {
             } else if (newVal === "FINALPATH") {
                 innerCell.style.backgroundColor = "lawngreen";
             } else {
-                //innerCell.style.backgroundColor = "red";
+                innerCell.style.backgroundColor = "red";
                 innerImg.style.display = 'none';
             }
         } else {
