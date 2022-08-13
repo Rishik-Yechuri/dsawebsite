@@ -47,9 +47,25 @@ Draggable {
     justify-content: center;
     transition: all 0.4s ease;
 }
-.innerCell:hover{
-    background-color: darkred;
+div.dragCell{
+    background-color: orange;
 }
+.innerCell:hover{
+    background-color: hotpink;
+}
+div.dragCell:hover{
+ background-color: orange;
+}
+.wallCell{
+    background-color: black;
+}
+.majorPointCell{
+    background-color: red;
+}
+/*.hoverCell{
+    background-color: orange;
+}*/
+
 
 .popUpContent {
     width: 22em;
