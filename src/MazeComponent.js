@@ -22,7 +22,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     const [endPointYState, setEndPointYState] = useState(0);
     //var endPointX = 0;
     const [endPointXState, setEndPointXState] = useState(0);
-    let arr = JSON.parse(localStorage.getItem("arr"));
+    var arr = JSON.parse(localStorage.getItem("arr"));
     window.addEventListener('mousedown', (event) => {
         if (event.button === 2) {
             mouseDown = 1;
@@ -40,10 +40,14 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             popupLoaded();
         }
     });
+
     var gridSize = state;
     arr = JSON.parse(localStorage.getItem("arr"));
-    gridSize = arr.length
-
+    if (arr !== null) {
+        gridSize = arr.length
+    } else {
+        gridSize = 4;
+    }
     let [zoomSize, setZoomSize] = useState({zoomSize: 1});
     var mazeHolderDiv = document.getElementById("mazeHolderDiv");
     var zoom = (event) => {
@@ -60,7 +64,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             //gridSize = state;
         } else {
             //gridSize = arr.length;
-            createMaze(arr.length)
+            createMaze(gridSize)
         }
     }, [state]);
     useEffect(() => {
@@ -113,7 +117,19 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     }
 
     const aStar = (grid, startY, startX, finishY, finishX) => {
-        const n = grid.length;
+        var queue = new Queue();
+        var thingToEnqueue = (startY.toString() + "," + startX.toString()).toString();
+        queue.enqueue(thingToEnqueue);
+        var holdVisited = new Set();
+        holdVisited.add(thingToEnqueue);
+        var prev = [];
+        var locationInPrev = 0;
+        while (!queue.isEmpty()) {
+            var node = queue.dequeue();
+            var holdNodePos = node.split(",");
+
+        }
+        /*const n = grid.length;
         const visitedNodesInOrder = [];
         const queue = new Queue();
         var thingToEnqueue = (startY.toString() + "," + startX.toString()).toString();
@@ -161,10 +177,10 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
 
         }
         localStorage.setItem("arr", JSON.stringify(arr));
-        return visitedNodesInOrder
+        return visitedNodesInOrder*/
     };
 
-    function setPointValue(yCoord, xCoord, newVal) {
+    function setPointValue(yCoord, xCoord, newVal, dontChange) {
         arr = JSON.parse(localStorage.getItem("arr"));
         var environmentUpdated = true;
         var idName = "innerCell" + yCoord + "X" + xCoord;
@@ -197,13 +213,12 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         } else if (arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START" || newVal === "EMPTY") {
             innerImg.style.display = 'none';
             if (newVal === "WALL") {
-                //alert("arr:" + arr[yCoord][xCoord]);
-                if (arr[yCoord][xCoord] === "WALL") {
-                    //alert("removing");
+                if (arr[yCoord][xCoord] === "WALL" && !dontChange) {
+                    //alert("called");
+
                     innerCell.classList.remove('wallCell');
                     arr[yCoord][xCoord] = "EMPTY";
                     environmentUpdated = false;
-                   // innerCell.classList.add('');
                 } else {
                     innerCell.classList.add('wallCell');
                 }
@@ -243,11 +258,11 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
 
     function changeTile(ev) {
         var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
-        //alert("0:"+holdLoc[0] + " 1:" + holdLoc[1]);
         setPointValue(holdLoc[0], holdLoc[1], "WALL");
     }
 
     function createMaze(length) {
+        //  alert("SUP");
         var arrayDiffSize = false;
         arr = JSON.parse(localStorage.getItem("arr"));
         if (arr == null || length !== arr.length) {
@@ -322,12 +337,12 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                                 if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
                                     setPointValue(holdLoc[0], holdLoc[1], "EMPTY");
                                 } else {
-                                    setPointValue(holdLoc[0], holdLoc[1], arr[holdLoc[0]][holdLoc[1]]);
+                                    setPointValue(holdLoc[0], holdLoc[1], arr[holdLoc[0]][holdLoc[1]], true);
                                 }
                                 lastGoodY = holdLoc[0];
                                 lastGoodX = holdLoc[1];
                             } else {
-                                setPointValue(lastGoodY, lastGoodX, arr[lastGoodY][lastGoodX]);
+                                setPointValue(lastGoodY, lastGoodX, arr[lastGoodY][lastGoodX], true);
                             }
                         }
                     }
@@ -365,7 +380,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                                         holdLoc[1] = 0;
                                     } else if (arr[holdLoc[0]][holdLoc[1]] === "END") {
                                         holdLoc[0] = yLocOfStart;
-                                        holdLoc[1] = xLocOfEnd;
+                                        holdLoc[1] = arr.length - 2;
                                     }
                                 } else {
                                     holdLoc[0] = lastGoodY;
@@ -398,7 +413,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         if (!arrayDiffSize) {
             for (y = 0; y < length; y++) {
                 for (x = 0; x < length; x++) {
-                    setPointValue(y, x, arr[y][x]);
+                    setPointValue(y, x, arr[y][x], true);
                 }
             }
         } else {
