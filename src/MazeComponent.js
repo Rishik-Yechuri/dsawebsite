@@ -7,6 +7,7 @@ import Cookies from 'universal-cookie';
 
 
 const MazeComponent = ({state, algoState, buttonState, setState}) => {
+    let yLocOfStart = 8;
     var lastGoodY;
     var lastGoodX;
     var endLastGoodY;
@@ -79,8 +80,8 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         var holdState = algoState.toString();
         if (holdState === "A*") {
             arr = JSON.parse(localStorage.getItem("arr"));
-            aStar(arr, startPointYState, startPointXState, endPointYState, endPointXState);
-        } else {
+            aStar(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
+            } else {
         }
     }
 
@@ -115,69 +116,79 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             return this.length === 0;
         }
     }
+    const reconstructPath = (start,end,prev) => {
+        var path = [];
+        var pathPos = 0;
+        var keepGoing = true;
+        var currThing = end;
+        while(keepGoing){
+            path[pathPos] = currThing;
+            if(prev.get(currThing) === null){
+                keepGoing = false;
+            }else{
+                currThing = prev.get(currThing);
+            }
+            pathPos++;
+        }
+        path.reverse();
 
+        if(path[0] === start){
+            return path;
+        }
+        return null;
+    }
     const aStar = (grid, startY, startX, finishY, finishX) => {
+        var found = false;
         var queue = new Queue();
         var thingToEnqueue = (startY.toString() + "," + startX.toString()).toString();
         queue.enqueue(thingToEnqueue);
         var holdVisited = new Set();
         holdVisited.add(thingToEnqueue);
-        var prev = [];
-        var locationInPrev = 0;
+        var prev = new Map();
         while (!queue.isEmpty()) {
             var node = queue.dequeue();
             var holdNodePos = node.split(",");
-
+            var yPos = holdNodePos[0];
+            var xPos = holdNodePos[1];
+            var holdDirectionsToGo = []
+            var holdDirectionsPos = 0;
+            //alert("PointCoords:" + yPos + "," + xPos);
+            if(yPos > 0){
+                holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos)-1) + "," + xPos;
+                holdDirectionsPos++;
+            }
+            //alert("arrlen:" + arr.length + ",yPos+1:" + (yPos+1));
+            if((parseInt(yPos)+1) < arr.length){
+                holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos)+1) + "," + xPos;
+                holdDirectionsPos++;
+            }
+            if(xPos > 0){
+                holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos)-1);
+                holdDirectionsPos++;
+            }
+            if((parseInt(xPos)+1)<arr.length){
+                holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos)+1);
+                holdDirectionsPos++;
+            }
+            //alert("NumOfNeighbors:" + holdDirectionsPos);
+           // alert("holdNodePos:" + holdNodePos);
+            for(var x=0;x<holdDirectionsPos;x++){
+                if(!holdVisited.has(holdDirectionsToGo[x]) && !found){
+                    if((finishY+","+finishX)=== holdDirectionsToGo[x]){
+                        found = true;
+                    }
+                    alert("enqueue:" + holdDirectionsToGo[x]);
+                    queue.enqueue(holdDirectionsToGo[x]);
+                    holdVisited.add(holdDirectionsToGo[x]);
+                    alert("Prev Set:" + holdDirectionsToGo + "," + thingToEnqueue);
+                    prev.set(holdDirectionsToGo[x],thingToEnqueue);
+                }
+            }
         }
-        /*const n = grid.length;
-        const visitedNodesInOrder = [];
-        const queue = new Queue();
-        var thingToEnqueue = (startY.toString() + "," + startX.toString()).toString();
-        queue.enqueue(thingToEnqueue);
-        while (!queue.isEmpty()) {
-            var locString = queue.dequeue();
-            var yCoord = locString.split(",")[0];
-            var xCoord = locString.split(",")[1];
-            getPointValue(2, 0);
-            if (getPointValue(yCoord, xCoord) === "PATH") {
-                continue;
-            }
-
-            if (yCoord === finishY && xCoord === finishX) {
-                visitedNodesInOrder.push(yCoord + "," + xCoord);
-                setPointValue(yCoord, xCoord, "PATH")
-                break;
-            }
-
-            if (grid[yCoord][xCoord] === "WALL") {
-                continue;
-            }
-
-            if (yCoord < n - 1) {
-                queue.enqueue((yCoord + 1) + "," + xCoord);
-            }
-
-            if (yCoord > 0) {
-                queue.enqueue((yCoord - 1) + "," + xCoord);
-            }
-
-            if (xCoord < n - 1) {
-                queue.enqueue(yCoord + "," + (xCoord + 1));
-            }
-
-            if (xCoord > 0) {
-                queue.enqueue(yCoord + "," + (xCoord - 1));
-            }
-
-            if (grid[yCoord][xCoord] === "EMPTY") {
-                visitedNodesInOrder.push(yCoord + "," + xCoord);
-                grid[yCoord][xCoord] = "PATH";
-                setPointValue(yCoord, xCoord, "PATH")
-            }
-
-        }
-        localStorage.setItem("arr", JSON.stringify(arr));
-        return visitedNodesInOrder*/
+       // alert("SUPMATE:" + prev.get("1,1"));
+       // localStorage.setItem("testing",JSON.stringify(prev));
+        var finalPath = reconstructPath((startY+","+startX),(finishY+","+finishX),prev);
+        return finalPath;
     };
 
     function setPointValue(yCoord, xCoord, newVal, dontChange) {
@@ -197,6 +208,8 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             innerImg.style.width = '65%';
             setEndPointYState(yCoord);
             setEndPointXState(xCoord);
+            localStorage.setItem("endy",JSON.stringify(yCoord));
+            localStorage.setItem("endx",JSON.stringify(xCoord));
         } else if (newVal === "START") {
             if (arr[yCoord][xCoord] === "END") {
                 idName = "innerCell" + lastGoodY + "X" + lastGoodX;
@@ -208,14 +221,14 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             innerImg.src = startingarrow;
             innerImg.style.display = 'block';
             innerImg.style.width = '60%';
-            setStartPointYState(lastGoodY);
-            setStartPointXState(lastGoodX);
+            setStartPointYState(yCoord);
+            setStartPointXState(xCoord);
+            localStorage.setItem("starty",JSON.stringify(yCoord));
+            localStorage.setItem("startx",JSON.stringify(xCoord));
         } else if (arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START" || newVal === "EMPTY") {
             innerImg.style.display = 'none';
             if (newVal === "WALL") {
                 if (arr[yCoord][xCoord] === "WALL" && !dontChange) {
-                    //alert("called");
-
                     innerCell.classList.remove('wallCell');
                     arr[yCoord][xCoord] = "EMPTY";
                     environmentUpdated = false;
@@ -262,7 +275,6 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     }
 
     function createMaze(length) {
-        //  alert("SUP");
         var arrayDiffSize = false;
         arr = JSON.parse(localStorage.getItem("arr"));
         if (arr == null || length !== arr.length) {
@@ -283,7 +295,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             return;
         }
         gridSize = length;
-        var yLocOfStart = 0;
+         yLocOfStart = 0;
         if (length > 0) {
             yLocOfStart = parseInt(length / 2, 10);
         }
@@ -435,9 +447,18 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             }
             setEndPointYState(yLocOfStart);
             setEndPointXState(xLocOfEnd);
+            localStorage.setItem("starty",yLocOfStart);
+            localStorage.setItem("startx",JSON.stringify(0));
+            localStorage.setItem("endy",yLocOfStart);
+            localStorage.setItem("endx",xLocOfEnd);
             setPointValue(yLocOfStart, xLocOfEnd, "END");
             localStorage.setItem("mainpoints", JSON.stringify(true));
-        }
+        }/*else if(length > 1){
+            setStartPointYState(yLocOfStart); //= yLocOfStart;
+            setStartPointXState(0);
+            setEndPointYState(yLocOfStart);
+            setEndPointXState(xLocOfEnd);
+        }*/
     }
 
     var rejectModernity = (event) => {
