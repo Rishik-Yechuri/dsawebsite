@@ -76,12 +76,47 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         }
     }, [buttonState]);
 
-    function startSearching() {
+    async function drawPath(path) {
+        //alert("JERE:" + path);
+        var sizeOfPath = path.length;
+        for (var x = 0; x < sizeOfPath; x++) {
+            await new Promise(done => setTimeout(() => done(), 500));
+            var holdCoords = path[x].split(",");
+            var idName = "innerCell" + holdCoords[0] + "X" + holdCoords[1];
+            var thingToEdit = document.getElementById(idName);
+            thingToEdit.style.backgroundColor = "green";
+            //alert("here");
+        }
+        //alert("PS:" + sizeOfPath);
+        /*  for (var y = 0; y < 2; y++) {
+              for (var x = 0; x < 2; x++) {
+                  var idName = "innerCell" + y + "X" + x;
+                  var thingToEdit = document.getElementById(idName);
+                  thingToEdit.style.backgroundColor = "yellow";
+                  await new Promise(done => setTimeout(() => done(), 1000));
+              }
+          }*/
+    }
+
+    function delay(n) {
+        n = n || 2000;
+        return new Promise(done => {
+            setTimeout(() => {
+                done();
+            }, n);
+        });
+    }
+
+    function pause() {
+    }
+
+    async function startSearching() {
         var holdState = algoState.toString();
         if (holdState === "A*") {
             arr = JSON.parse(localStorage.getItem("arr"));
-            aStar(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
-            } else {
+            const path = await aStar(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
+            await drawPath(path);
+        } else {
         }
     }
 
@@ -116,80 +151,207 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             return this.length === 0;
         }
     }
-    const reconstructPath = (start,end,prev) => {
+
+    const reconstructPath = (start, end, prev) => {
+        // alert("here");
         var path = [];
         var pathPos = 0;
         var keepGoing = true;
         var currThing = end;
-        while(keepGoing){
+        while (keepGoing) {
+            //alert("path[" + pathPos+"] = " + currThing);
             path[pathPos] = currThing;
-            if(prev.get(currThing) === null){
+            if (prev.get(currThing) === undefined) {
                 keepGoing = false;
-            }else{
+            } else {
+                //alert("currThing:" + prev.get(currThing));
                 currThing = prev.get(currThing);
             }
             pathPos++;
         }
+        //alert("here");
         path.reverse();
-
-        if(path[0] === start){
+        //alert("Path:" + path[3]);
+        if (path[0] === start) {
             return path;
         }
         return null;
     }
-    const aStar = (grid, startY, startX, finishY, finishX) => {
+
+    function sortedIndex(array, value) {
+        var low = 0,
+            high = array.length;
+        while (low < high) {
+            var mid = (low + high) >>> 1;
+            if (array[mid][0] < value) low = mid + 1;
+            else high = mid;
+        }
+        return low;
+    }
+
+    function binarySearch(sortedArray, key){
+        let start = 0;
+        let end = sortedArray.length - 1;
+
+        while (start <= end) {
+            let middle = Math.floor((start + end) / 2);
+
+            if (sortedArray[middle][0] === key) {
+                // found the key
+                return middle;
+            } else if (sortedArray[middle] < key) {
+                // continue searching to the right
+                start = middle + 1;
+            } else {
+                // search searching to the left
+                end = middle - 1;
+            }
+        }
+        // key wasn't found
+        return -1;
+    }
+
+    async function aStar(grid, startY, startX, finishY, finishX) {
+        //alert("PLEEZ");
+        var holdDistFromStartNode = new Map();
+        var holdDistFromEndNode = new Map();
+        var endFound = false;
+        var yPosOfEnd = JSON.parse(localStorage.getItem("endy"));
+        var xPosOfEnd = JSON.parse(localStorage.getItem("endx"));
         var found = false;
-        var queue = new Queue();
+        var queue = [];
+        //alert("PLEEZ");
+        //await new Promise(done => setTimeout(() => done(), 1000));
         var thingToEnqueue = (startY.toString() + "," + startX.toString()).toString();
-        queue.enqueue(thingToEnqueue);
+        var distVal = (Math.abs(yPosOfEnd - startY) + Math.abs(xPosOfEnd - startX));
+        holdDistFromStartNode.set(thingToEnqueue, 0);
+        holdDistFromEndNode.set(thingToEnqueue, distVal);
+        var arrayToQueue = [];
+        arrayToQueue[0] = distVal;
+        arrayToQueue[1] = thingToEnqueue;
+        // alert("PLEEZ");
+        queue.push(arrayToQueue);
+        //alert("PLEEZ");
         var holdVisited = new Set();
-        holdVisited.add(thingToEnqueue);
+        //holdVisited.add(thingToEnqueue);
         var prev = new Map();
-        while (!queue.isEmpty()) {
-            var node = queue.dequeue();
-            var holdNodePos = node.split(",");
-            var yPos = holdNodePos[0];
-            var xPos = holdNodePos[1];
-            var holdDirectionsToGo = []
-            var holdDirectionsPos = 0;
-            //alert("PointCoords:" + yPos + "," + xPos);
-            if(yPos > 0){
-                holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos)-1) + "," + xPos;
-                holdDirectionsPos++;
-            }
-            //alert("arrlen:" + arr.length + ",yPos+1:" + (yPos+1));
-            if((parseInt(yPos)+1) < arr.length){
-                holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos)+1) + "," + xPos;
-                holdDirectionsPos++;
-            }
-            if(xPos > 0){
-                holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos)-1);
-                holdDirectionsPos++;
-            }
-            if((parseInt(xPos)+1)<arr.length){
-                holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos)+1);
-                holdDirectionsPos++;
-            }
-            //alert("NumOfNeighbors:" + holdDirectionsPos);
-           // alert("holdNodePos:" + holdNodePos);
-            for(var x=0;x<holdDirectionsPos;x++){
-                if(!holdVisited.has(holdDirectionsToGo[x]) && !found){
-                    if((finishY+","+finishX)=== holdDirectionsToGo[x]){
-                        found = true;
+        // alert("PLEEZ");
+        while (queue.length && !endFound) {
+            var node = queue.shift();
+            if (!holdVisited.has(node[1])) {
+            await new Promise(done => setTimeout(() => done(), 500));
+            //alert("Queue:" + queue);
+
+                //alert("NodeVal:" + node[1]);
+                //var nodeDist = node[0];
+                var holdNodePos = node[1].split(",");
+                //alert("currNode:" + node[1]);
+                //alert("currNode:" + node[1]);
+                var yPos = holdNodePos[0];
+                var xPos = holdNodePos[1];
+                if (node[1] === finishY + ',' + finishX) {
+                    endFound = true;
+                }
+                //alert("This:" + node[1]);
+                var holdDirectionsToGo = [];
+                var holdDirectionsPos = 0;
+                //Draw node on grid
+                var idName = "innerCell" + holdNodePos[0] + "X" + holdNodePos[1];
+                var thingToEdit = document.getElementById(idName);
+                thingToEnqueue = yPos + "," + xPos;
+                holdVisited.add(thingToEnqueue);
+                thingToEdit.style.backgroundColor = "yellow";
+                if (yPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) - 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(xPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) + 1);
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(yPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) + 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if (xPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) - 1);
+                    holdDirectionsPos++;
+                }
+
+                for (var i = 0; i < holdDirectionsPos; i++) {
+                    var isWall = false;
+                    var splitCoords = holdDirectionsToGo[i].split(",");
+                    if (await getPointValue(splitCoords[0], splitCoords[1]) === "WALL") {
+                        //alert("ISWALL");
+                        isWall = true;
                     }
-                    alert("enqueue:" + holdDirectionsToGo[x]);
-                    queue.enqueue(holdDirectionsToGo[x]);
-                    holdVisited.add(holdDirectionsToGo[x]);
-                    alert("Prev Set:" + holdDirectionsToGo + "," + thingToEnqueue);
-                    prev.set(holdDirectionsToGo[x],thingToEnqueue);
+                    thingToEnqueue = (splitCoords[0].toString() + "," + splitCoords[1].toString()).toString();
+                    //alert("Thing to queue:" + thingToEnqueue);
+                    if (!isWall /*&& !holdVisited.has(thingToEnqueue)*/) {
+                        //var distanceTraveled = holdDistFromStartNode.get(node[1])+1;
+                        distVal = (Math.abs(yPosOfEnd - splitCoords[0]) + Math.abs(xPosOfEnd - splitCoords[1]));
+                        //distVal+=distanceTraveled;
+                        //alert(thingToEnqueue + " DV:" + distVal);
+                        //holdDistFromStartNode.set(thingToEnqueue,distVal);
+                      //  var locationInQueueTemp;
+                        var betterValue = false;
+                        //alert("Thing To queue:" + thingToEnqueue);
+                        var lastDistFromStart = holdDistFromStartNode.get(thingToEnqueue);
+                        //alert("lastDistStart:" + lastDistFromStart);
+                        //if(lastDistFromStart !== undefined){
+                            //var oldArray = [];
+                            //oldArray[0] = lastDistFromStart + holdDistFromEndNode.get(thingToEnqueue);
+                            //oldArray[1] = thingToEnqueue;
+                            //queue.
+                            //locationInQueueTemp = sortedIndex(queue, distVal + lastDistFromStart);
+                         //   alert("locQueueTemp:" + locationInQueueTemp);
+                            //queue.splice(locationInQueueTemp, 1);
+                          //  alert("spliced");
+                       // }
+                        if (lastDistFromStart === undefined || holdDistFromStartNode.get(node[1]) + 1 < lastDistFromStart) {
+                            lastDistFromStart = holdDistFromStartNode.get(node[1]) + 1;
+                            //alert("LastDist smaller:" + lastDistFromStart);
+                            prev.set(thingToEnqueue, node[1]);
+                            betterValue = true;
+                        }
+
+                        //alert(thingToEnqueue + ":" + lastDistFromStart);
+                        holdDistFromStartNode.set(thingToEnqueue, lastDistFromStart);
+                        holdDistFromEndNode.set(thingToEnqueue, distVal);
+                        //alert("DistVal:" + distVal);
+                       // alert("lastDistFromStart:" + lastDistFromStart);
+                        var locationInQueue = sortedIndex(queue, distVal + lastDistFromStart);
+                       // alert("Loc in Queue:" + locationInQueue);
+                        var newArrayToQueue = [];
+                        newArrayToQueue[0] = distVal + lastDistFromStart;
+                        newArrayToQueue[1] = thingToEnqueue;
+                        //alert("Queue:" + queue);
+                        // alert("queue[" + locationInQueue + "] = " + newArrayToQueue)
+                        //queue[locationInQueue] = newArrayToQueue;
+                        //if (!holdVisited.has(thingToEnqueue)) {
+                        queue.splice(locationInQueue, 0, newArrayToQueue);
+                        var sizeOfQueue = queue.length;
+                        for(var b=0;b<sizeOfQueue;b++){
+                            //alert("NewQueue[" + b + "]:" + queue[b]);
+                        }
+                        //holdVisited.add(thingToEnqueue);
+                        /* if(!betterValue){
+                             prev.set(thingToEnqueue, node[1]);
+                         }*/
+                        //
+                        /*queue.splice(locationInQueue,0,newArrayToQueue);
+                        holdVisited.add(thingToEnqueue);*/
+                        //prev.set(thingToEnqueue, node[1]);
+                    }
                 }
             }
         }
-       // alert("SUPMATE:" + prev.get("1,1"));
-       // localStorage.setItem("testing",JSON.stringify(prev));
-        var finalPath = reconstructPath((startY+","+startX),(finishY+","+finishX),prev);
-        return finalPath;
-    };
+        // alert("SUPMATE:" + prev.get("1,1"));
+        // localStorage.setItem("testing",JSON.stringify(prev));
+        return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
+        //alert("FP:" + finalPath[3]);
+        //return finalPath;
+    }
 
     function setPointValue(yCoord, xCoord, newVal, dontChange) {
         arr = JSON.parse(localStorage.getItem("arr"));
@@ -208,8 +370,8 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             innerImg.style.width = '65%';
             setEndPointYState(yCoord);
             setEndPointXState(xCoord);
-            localStorage.setItem("endy",JSON.stringify(yCoord));
-            localStorage.setItem("endx",JSON.stringify(xCoord));
+            localStorage.setItem("endy", JSON.stringify(yCoord));
+            localStorage.setItem("endx", JSON.stringify(xCoord));
         } else if (newVal === "START") {
             if (arr[yCoord][xCoord] === "END") {
                 idName = "innerCell" + lastGoodY + "X" + lastGoodX;
@@ -223,8 +385,8 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             innerImg.style.width = '60%';
             setStartPointYState(yCoord);
             setStartPointXState(xCoord);
-            localStorage.setItem("starty",JSON.stringify(yCoord));
-            localStorage.setItem("startx",JSON.stringify(xCoord));
+            localStorage.setItem("starty", JSON.stringify(yCoord));
+            localStorage.setItem("startx", JSON.stringify(xCoord));
         } else if (arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START" || newVal === "EMPTY") {
             innerImg.style.display = 'none';
             if (newVal === "WALL") {
@@ -295,7 +457,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             return;
         }
         gridSize = length;
-         yLocOfStart = 0;
+        yLocOfStart = 0;
         if (length > 0) {
             yLocOfStart = parseInt(length / 2, 10);
         }
@@ -447,10 +609,10 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             }
             setEndPointYState(yLocOfStart);
             setEndPointXState(xLocOfEnd);
-            localStorage.setItem("starty",yLocOfStart);
-            localStorage.setItem("startx",JSON.stringify(0));
-            localStorage.setItem("endy",yLocOfStart);
-            localStorage.setItem("endx",xLocOfEnd);
+            localStorage.setItem("starty", yLocOfStart);
+            localStorage.setItem("startx", JSON.stringify(0));
+            localStorage.setItem("endy", yLocOfStart);
+            localStorage.setItem("endx", xLocOfEnd);
             setPointValue(yLocOfStart, xLocOfEnd, "END");
             localStorage.setItem("mainpoints", JSON.stringify(true));
         }/*else if(length > 1){
