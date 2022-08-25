@@ -62,9 +62,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         arr = JSON.parse(localStorage.getItem("arr"));
         if (state > 1) {
             createMaze(state)
-            //gridSize = state;
         } else {
-            //gridSize = arr.length;
             createMaze(gridSize)
         }
     }, [state]);
@@ -77,7 +75,6 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     }, [buttonState]);
 
     async function drawPath(path) {
-        //alert("JERE:" + path);
         var sizeOfPath = path.length;
         for (var x = 0; x < sizeOfPath; x++) {
             await new Promise(done => setTimeout(() => done(), 500));
@@ -85,17 +82,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             var idName = "innerCell" + holdCoords[0] + "X" + holdCoords[1];
             var thingToEdit = document.getElementById(idName);
             thingToEdit.style.backgroundColor = "green";
-            //alert("here");
         }
-        //alert("PS:" + sizeOfPath);
-        /*  for (var y = 0; y < 2; y++) {
-              for (var x = 0; x < 2; x++) {
-                  var idName = "innerCell" + y + "X" + x;
-                  var thingToEdit = document.getElementById(idName);
-                  thingToEdit.style.backgroundColor = "yellow";
-                  await new Promise(done => setTimeout(() => done(), 1000));
-              }
-          }*/
     }
 
     function delay(n) {
@@ -111,12 +98,16 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     }
 
     async function startSearching() {
+        arr = JSON.parse(localStorage.getItem("arr"));
         var holdState = algoState.toString();
         if (holdState === "A*") {
             arr = JSON.parse(localStorage.getItem("arr"));
             const path = await aStar(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
             await drawPath(path);
-        } else {
+        } else if (holdState === "Breadth First") {
+            const path = await BFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
+            //alert("DOWNHERE");
+            await drawPath(path);
         }
     }
 
@@ -158,18 +149,23 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         var pathPos = 0;
         var keepGoing = true;
         var currThing = end;
+        //alert("RC1");
         while (keepGoing) {
             //alert("path[" + pathPos+"] = " + currThing);
+            //alert("RC2");
             path[pathPos] = currThing;
+            //alert("Prev of Curr(" + currThing + ")" + "= " + prev.get(currThing))
             if (prev.get(currThing) === undefined) {
                 keepGoing = false;
             } else {
                 //alert("currThing:" + prev.get(currThing));
                 currThing = prev.get(currThing);
             }
+            //alert("RC3");
             pathPos++;
         }
         //alert("here");
+        //alert("RC4");
         path.reverse();
         //alert("Path:" + path[3]);
         if (path[0] === start) {
@@ -189,7 +185,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         return low;
     }
 
-    function binarySearch(sortedArray, key){
+    function binarySearch(sortedArray, key) {
         let start = 0;
         let end = sortedArray.length - 1;
 
@@ -211,8 +207,67 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         return -1;
     }
 
+    async function BFS(grid, startY, startX, finishY, finishX) {
+        var prev = new Map();
+        var found = false;
+        var holdVisited = new Set();
+        var queue = new Queue();
+        queue.enqueue(startY + "," + startX);
+        while (!queue.isEmpty()) {
+            var node = queue.dequeue();
+            if (!holdVisited.has(node) && !found) {
+                //alert("VISITING:" + node);
+                await new Promise(done => setTimeout(() => done(), 500));
+                holdVisited.add(node);
+                var splitCoords = node.split(",");
+                var holdDirectionsToGo = [];
+                var holdDirectionsPos = 0;
+                if (node === finishY + "," + finishX) {
+                    found = true;
+                }
+                var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
+                var thingToEdit = document.getElementById(idName);
+                thingToEdit.style.backgroundColor = "yellow";
+                var yPos = splitCoords[0];
+                var xPos = splitCoords[1];
+                if (yPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) - 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(xPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) + 1);
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(yPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) + 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if (xPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) - 1);
+                    holdDirectionsPos++;
+                }
+                for (var i = 0; i < holdDirectionsPos; i++) {
+                    //var isWall = false;
+                    var childSplitCoords = holdDirectionsToGo[i].split(",");
+                    if (await getPointValue(childSplitCoords[0], childSplitCoords[1]) !== "WALL" && !holdVisited.has(holdDirectionsToGo[i])) {
+                        //isWall = true;
+                        var childToEnqueue = (childSplitCoords[0].toString() + "," + childSplitCoords[1].toString()).toString();
+                        queue.enqueue(childToEnqueue);
+                        //alert("Set " + childToEnqueue + "to " + node)
+                        prev.set(childToEnqueue, node);
+                    }
+                    //                var childToEnqueue = (childSplitCoords[0].toString() + "," + childSplitCoords[1].toString()).toString();
+                    // if (!isWall) {
+                    //                      queue.enqueue(childToEnqueue);
+                    // }
+                }
+            }
+        }
+        //alert("PRERECONSTRUCT");
+        return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
+    }
+
     async function aStar(grid, startY, startX, finishY, finishX) {
-        //alert("PLEEZ");
         var holdDistFromStartNode = new Map();
         var holdDistFromEndNode = new Map();
         var endFound = false;
@@ -220,8 +275,6 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         var xPosOfEnd = JSON.parse(localStorage.getItem("endx"));
         var found = false;
         var queue = [];
-        //alert("PLEEZ");
-        //await new Promise(done => setTimeout(() => done(), 1000));
         var thingToEnqueue = (startY.toString() + "," + startX.toString()).toString();
         var distVal = (Math.abs(yPosOfEnd - startY) + Math.abs(xPosOfEnd - startX));
         holdDistFromStartNode.set(thingToEnqueue, 0);
@@ -229,30 +282,19 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         var arrayToQueue = [];
         arrayToQueue[0] = distVal;
         arrayToQueue[1] = thingToEnqueue;
-        // alert("PLEEZ");
         queue.push(arrayToQueue);
-        //alert("PLEEZ");
         var holdVisited = new Set();
-        //holdVisited.add(thingToEnqueue);
         var prev = new Map();
-        // alert("PLEEZ");
         while (queue.length && !endFound) {
             var node = queue.shift();
             if (!holdVisited.has(node[1])) {
-            await new Promise(done => setTimeout(() => done(), 500));
-            //alert("Queue:" + queue);
-
-                //alert("NodeVal:" + node[1]);
-                //var nodeDist = node[0];
+                await new Promise(done => setTimeout(() => done(), 500));
                 var holdNodePos = node[1].split(",");
-                //alert("currNode:" + node[1]);
-                //alert("currNode:" + node[1]);
                 var yPos = holdNodePos[0];
                 var xPos = holdNodePos[1];
                 if (node[1] === finishY + ',' + finishX) {
                     endFound = true;
                 }
-                //alert("This:" + node[1]);
                 var holdDirectionsToGo = [];
                 var holdDirectionsPos = 0;
                 //Draw node on grid
@@ -282,75 +324,34 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                     var isWall = false;
                     var splitCoords = holdDirectionsToGo[i].split(",");
                     if (await getPointValue(splitCoords[0], splitCoords[1]) === "WALL") {
-                        //alert("ISWALL");
                         isWall = true;
                     }
                     thingToEnqueue = (splitCoords[0].toString() + "," + splitCoords[1].toString()).toString();
-                    //alert("Thing to queue:" + thingToEnqueue);
-                    if (!isWall /*&& !holdVisited.has(thingToEnqueue)*/) {
-                        //var distanceTraveled = holdDistFromStartNode.get(node[1])+1;
+                    if (!isWall) {
                         distVal = (Math.abs(yPosOfEnd - splitCoords[0]) + Math.abs(xPosOfEnd - splitCoords[1]));
-                        //distVal+=distanceTraveled;
-                        //alert(thingToEnqueue + " DV:" + distVal);
-                        //holdDistFromStartNode.set(thingToEnqueue,distVal);
-                      //  var locationInQueueTemp;
                         var betterValue = false;
-                        //alert("Thing To queue:" + thingToEnqueue);
                         var lastDistFromStart = holdDistFromStartNode.get(thingToEnqueue);
-                        //alert("lastDistStart:" + lastDistFromStart);
-                        //if(lastDistFromStart !== undefined){
-                            //var oldArray = [];
-                            //oldArray[0] = lastDistFromStart + holdDistFromEndNode.get(thingToEnqueue);
-                            //oldArray[1] = thingToEnqueue;
-                            //queue.
-                            //locationInQueueTemp = sortedIndex(queue, distVal + lastDistFromStart);
-                         //   alert("locQueueTemp:" + locationInQueueTemp);
-                            //queue.splice(locationInQueueTemp, 1);
-                          //  alert("spliced");
-                       // }
                         if (lastDistFromStart === undefined || holdDistFromStartNode.get(node[1]) + 1 < lastDistFromStart) {
                             lastDistFromStart = holdDistFromStartNode.get(node[1]) + 1;
-                            //alert("LastDist smaller:" + lastDistFromStart);
                             prev.set(thingToEnqueue, node[1]);
                             betterValue = true;
                         }
 
-                        //alert(thingToEnqueue + ":" + lastDistFromStart);
                         holdDistFromStartNode.set(thingToEnqueue, lastDistFromStart);
                         holdDistFromEndNode.set(thingToEnqueue, distVal);
-                        //alert("DistVal:" + distVal);
-                       // alert("lastDistFromStart:" + lastDistFromStart);
                         var locationInQueue = sortedIndex(queue, distVal + lastDistFromStart);
-                       // alert("Loc in Queue:" + locationInQueue);
                         var newArrayToQueue = [];
                         newArrayToQueue[0] = distVal + lastDistFromStart;
                         newArrayToQueue[1] = thingToEnqueue;
-                        //alert("Queue:" + queue);
-                        // alert("queue[" + locationInQueue + "] = " + newArrayToQueue)
-                        //queue[locationInQueue] = newArrayToQueue;
-                        //if (!holdVisited.has(thingToEnqueue)) {
                         queue.splice(locationInQueue, 0, newArrayToQueue);
-                        var sizeOfQueue = queue.length;
-                        for(var b=0;b<sizeOfQueue;b++){
-                            //alert("NewQueue[" + b + "]:" + queue[b]);
-                        }
-                        //holdVisited.add(thingToEnqueue);
-                        /* if(!betterValue){
-                             prev.set(thingToEnqueue, node[1]);
-                         }*/
-                        //
-                        /*queue.splice(locationInQueue,0,newArrayToQueue);
-                        holdVisited.add(thingToEnqueue);*/
-                        //prev.set(thingToEnqueue, node[1]);
+                        //var sizeOfQueue = queue.length;
+                        /*for (var b = 0; b < sizeOfQueue; b++) {
+                        }*/
                     }
                 }
             }
         }
-        // alert("SUPMATE:" + prev.get("1,1"));
-        // localStorage.setItem("testing",JSON.stringify(prev));
         return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
-        //alert("FP:" + finalPath[3]);
-        //return finalPath;
     }
 
     function setPointValue(yCoord, xCoord, newVal, dontChange) {
@@ -615,12 +616,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             localStorage.setItem("endx", xLocOfEnd);
             setPointValue(yLocOfStart, xLocOfEnd, "END");
             localStorage.setItem("mainpoints", JSON.stringify(true));
-        }/*else if(length > 1){
-            setStartPointYState(yLocOfStart); //= yLocOfStart;
-            setStartPointXState(0);
-            setEndPointYState(yLocOfStart);
-            setEndPointXState(xLocOfEnd);
-        }*/
+        }
     }
 
     var rejectModernity = (event) => {

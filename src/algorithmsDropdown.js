@@ -44,7 +44,7 @@ const algorithmsDropdown = ({setState,setAlgoState}) => {
 */}
                 <a className={"link"} href="#" onClick={() => updateDropdownText("A*")}>A*</a>
                 <a className={"link"} href="#" onClick={() => updateDropdownText("Bidirectional")}>Bidirectional</a>
-                <a className={"link"} href="#" onClick={() => updateDropdownText("Breadth First")}>Breadth First*</a>
+                <a className={"link"} href="#" onClick={() => updateDropdownText("Breadth First")}>Breadth First</a>
                 <a className={"link"} href="#" onClick={() => updateDropdownText("Depth First")}>Depth First</a>
             </div>
         </>
