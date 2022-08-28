@@ -77,7 +77,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     async function drawPath(path) {
         var sizeOfPath = path.length;
         for (var x = 0; x < sizeOfPath; x++) {
-            await new Promise(done => setTimeout(() => done(), 500));
+            await new Promise(done => setTimeout(() => done(), 200));
             var holdCoords = path[x].split(",");
             var idName = "innerCell" + holdCoords[0] + "X" + holdCoords[1];
             var thingToEdit = document.getElementById(idName);
@@ -107,6 +107,12 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         } else if (holdState === "Breadth First") {
             const path = await BFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
             //alert("DOWNHERE");
+            await drawPath(path);
+        } else if (holdState === "Depth First") {
+            var set = new Set();
+            var arrForFinish = [false];
+            const path = await DFSCaller(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")), new Map(), arr.length, set, arrForFinish,undefined);
+            //return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
             await drawPath(path);
         }
     }
@@ -143,7 +149,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         }
     }
 
-    const reconstructPath = (start, end, prev) => {
+    function reconstructPath(start, end, prev){
         // alert("here");
         var path = [];
         var pathPos = 0;
@@ -151,7 +157,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         var currThing = end;
         //alert("RC1");
         while (keepGoing) {
-            //alert("path[" + pathPos+"] = " + currThing);
+            alert("path[" + pathPos+"] = " + currThing);
             //alert("RC2");
             path[pathPos] = currThing;
             //alert("Prev of Curr(" + currThing + ")" + "= " + prev.get(currThing))
@@ -207,6 +213,84 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         return -1;
     }
 
+    async function DFSCaller(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished,parentNode) {
+        // alert("SUPMATE");
+        var pathArray = await DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished,parentNode);
+        alert("SUP");
+        return reconstructPath((currY + "," + currX), (finishY + "," + finishX), pathArray);
+
+    }
+
+    async function DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished,parentNode) {
+        //alert("FinishStat:" + finished[0]);
+        if (!finished[0]) {
+            var shortestPath = pathArray;
+            var shortestLen = Number.MAX_VALUE;
+            var currNode = currY + "," + currX;
+            pathArray.set(currNode, parentNode);
+            //alert(currNode + " set to " + parentNode);
+            /*alert("FinishY:" + finishY);
+            alert("FinishX:" + finishX);
+            alert("here:" + currNode);*/
+            if (parseInt(finishY) === parseInt(currY) && parseInt(finishX) === parseInt(currX)) {
+                //alert("FINISH");
+                finished[0] = true;
+            }
+            visitedNodes.add(currNode);
+            //alert("here2");
+            await new Promise(done => setTimeout(() => done(), 200));
+            //alert("here2.5");
+            var idName = "innerCell" + currY + "X" + currX;
+            var thingToEdit = document.getElementById(idName);
+            thingToEdit.style.backgroundColor = "yellow";
+            var childNodes = new Array();
+
+            //alert("here2.6");
+            if (!visitedNodes.has((parseInt(currY) - 1) + "," + currX) && parseInt(currY) - 1 >= 0) {
+              //  alert("here2.7:" + currX);
+                childNodes.push((parseInt(currY) - 1) + "," + currX);
+               // alert("here2.75");
+            }
+            if (!visitedNodes.has(currY + "," + (parseInt(currX) + 1)) && (parseInt(currX) + 1) < arrLen) {
+           //     alert("here2.8");
+                childNodes.push(currY + "," + (parseInt(currX) + 1));
+            }
+            if (!visitedNodes.has((parseInt(currY) + 1) + "," + currX) && (parseInt(currY) + 1) < arrLen) {
+             //   alert("here2.9");
+                childNodes.push((parseInt(currY) + 1) + "," + currX);
+            }
+            if (!visitedNodes.has(currY + "," + (parseInt(currX) - 1)) && (parseInt(currX) - 1) >= 0) {
+               // alert("here2.99");
+                childNodes.push(currY + "," + (parseInt(currX) - 1));
+            }
+            //alert("here3");
+            var lenOfChildren = childNodes.length;
+            //alert("LenOfChildren:" + lenOfChildren);
+            if (!finished[0]) {
+                for (var i = 0; i < lenOfChildren; i++) {
+                    //alert("CHILDVAL:" +  getPointValue(childNodes[i].split(",")[0], childNodes[i].split(",")[1]));
+                    if (await getPointValue(childNodes[i].split(",")[0], childNodes[i].split(",")[1]) !== "WALL") {
+                        var checkIfContains = pathArray.get(childNodes[i]);
+                        //alert("CHeck:" + checkIfContains);
+                        if(checkIfContains!==undefined) {
+                            //pathArray.remove(childNodes[i]);
+                            //pathArray.setItem(childNodes[i],currNode);
+                        }
+ //                       pathArray.set(childNodes[i], parentNode);
+                        //var arrForFinish = [false]
+                        var tempPath = await DFS(grid, childNodes[i].split(",")[0], childNodes[i].split(",")[1], finishY, finishX, pathArray, arrLen, visitedNodes, finished,currNode);
+                        /* if (tempPath.length() < shortestLen) {
+                             shortestPath = tempPath;
+                             shortestLen = tempPath.length;
+                         }*/
+                    }
+                }
+            }
+        }
+        alert("end");
+        return pathArray;
+    }
+
     async function BFS(grid, startY, startX, finishY, finishX) {
         var prev = new Map();
         var found = false;
@@ -216,7 +300,6 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         while (!queue.isEmpty()) {
             var node = queue.dequeue();
             if (!holdVisited.has(node) && !found) {
-                //alert("VISITING:" + node);
                 await new Promise(done => setTimeout(() => done(), 500));
                 holdVisited.add(node);
                 var splitCoords = node.split(",");
@@ -247,23 +330,15 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                     holdDirectionsPos++;
                 }
                 for (var i = 0; i < holdDirectionsPos; i++) {
-                    //var isWall = false;
                     var childSplitCoords = holdDirectionsToGo[i].split(",");
                     if (await getPointValue(childSplitCoords[0], childSplitCoords[1]) !== "WALL" && !holdVisited.has(holdDirectionsToGo[i])) {
-                        //isWall = true;
                         var childToEnqueue = (childSplitCoords[0].toString() + "," + childSplitCoords[1].toString()).toString();
                         queue.enqueue(childToEnqueue);
-                        //alert("Set " + childToEnqueue + "to " + node)
                         prev.set(childToEnqueue, node);
                     }
-                    //                var childToEnqueue = (childSplitCoords[0].toString() + "," + childSplitCoords[1].toString()).toString();
-                    // if (!isWall) {
-                    //                      queue.enqueue(childToEnqueue);
-                    // }
                 }
             }
         }
-        //alert("PRERECONSTRUCT");
         return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
     }
 
