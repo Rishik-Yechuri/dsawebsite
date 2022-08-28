@@ -106,13 +106,15 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             await drawPath(path);
         } else if (holdState === "Breadth First") {
             const path = await BFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
-            //alert("DOWNHERE");
             await drawPath(path);
         } else if (holdState === "Depth First") {
             var set = new Set();
             var arrForFinish = [false];
-            const path = await DFSCaller(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")), new Map(), arr.length, set, arrForFinish,undefined);
+            const path = await DFSCaller(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")), new Map(), arr.length, set, arrForFinish, undefined);
             //return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
+            await drawPath(path);
+        } else if (holdState === "Bidirectional") {
+            const path = await BiBFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
             await drawPath(path);
         }
     }
@@ -149,31 +151,21 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         }
     }
 
-    function reconstructPath(start, end, prev){
-        // alert("here");
+    function reconstructPath(start, end, prev) {
         var path = [];
         var pathPos = 0;
         var keepGoing = true;
         var currThing = end;
-        //alert("RC1");
         while (keepGoing) {
-            alert("path[" + pathPos+"] = " + currThing);
-            //alert("RC2");
             path[pathPos] = currThing;
-            //alert("Prev of Curr(" + currThing + ")" + "= " + prev.get(currThing))
             if (prev.get(currThing) === undefined) {
                 keepGoing = false;
             } else {
-                //alert("currThing:" + prev.get(currThing));
                 currThing = prev.get(currThing);
             }
-            //alert("RC3");
             pathPos++;
         }
-        //alert("here");
-        //alert("RC4");
         path.reverse();
-        //alert("Path:" + path[3]);
         if (path[0] === start) {
             return path;
         }
@@ -213,82 +205,198 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         return -1;
     }
 
-    async function DFSCaller(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished,parentNode) {
-        // alert("SUPMATE");
-        var pathArray = await DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished,parentNode);
-        alert("SUP");
+    async function DFSCaller(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished, parentNode) {
+        var pathArray = await DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished, parentNode);
         return reconstructPath((currY + "," + currX), (finishY + "," + finishX), pathArray);
 
     }
 
-    async function DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished,parentNode) {
-        //alert("FinishStat:" + finished[0]);
+    async function DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished, parentNode) {
         if (!finished[0]) {
             var shortestPath = pathArray;
             var shortestLen = Number.MAX_VALUE;
             var currNode = currY + "," + currX;
             pathArray.set(currNode, parentNode);
-            //alert(currNode + " set to " + parentNode);
-            /*alert("FinishY:" + finishY);
-            alert("FinishX:" + finishX);
-            alert("here:" + currNode);*/
             if (parseInt(finishY) === parseInt(currY) && parseInt(finishX) === parseInt(currX)) {
-                //alert("FINISH");
                 finished[0] = true;
             }
             visitedNodes.add(currNode);
-            //alert("here2");
             await new Promise(done => setTimeout(() => done(), 200));
-            //alert("here2.5");
             var idName = "innerCell" + currY + "X" + currX;
             var thingToEdit = document.getElementById(idName);
             thingToEdit.style.backgroundColor = "yellow";
             var childNodes = new Array();
 
-            //alert("here2.6");
             if (!visitedNodes.has((parseInt(currY) - 1) + "," + currX) && parseInt(currY) - 1 >= 0) {
-              //  alert("here2.7:" + currX);
                 childNodes.push((parseInt(currY) - 1) + "," + currX);
-               // alert("here2.75");
             }
             if (!visitedNodes.has(currY + "," + (parseInt(currX) + 1)) && (parseInt(currX) + 1) < arrLen) {
-           //     alert("here2.8");
                 childNodes.push(currY + "," + (parseInt(currX) + 1));
             }
             if (!visitedNodes.has((parseInt(currY) + 1) + "," + currX) && (parseInt(currY) + 1) < arrLen) {
-             //   alert("here2.9");
                 childNodes.push((parseInt(currY) + 1) + "," + currX);
             }
             if (!visitedNodes.has(currY + "," + (parseInt(currX) - 1)) && (parseInt(currX) - 1) >= 0) {
-               // alert("here2.99");
                 childNodes.push(currY + "," + (parseInt(currX) - 1));
             }
-            //alert("here3");
             var lenOfChildren = childNodes.length;
-            //alert("LenOfChildren:" + lenOfChildren);
             if (!finished[0]) {
                 for (var i = 0; i < lenOfChildren; i++) {
-                    //alert("CHILDVAL:" +  getPointValue(childNodes[i].split(",")[0], childNodes[i].split(",")[1]));
                     if (await getPointValue(childNodes[i].split(",")[0], childNodes[i].split(",")[1]) !== "WALL") {
                         var checkIfContains = pathArray.get(childNodes[i]);
-                        //alert("CHeck:" + checkIfContains);
-                        if(checkIfContains!==undefined) {
-                            //pathArray.remove(childNodes[i]);
-                            //pathArray.setItem(childNodes[i],currNode);
-                        }
- //                       pathArray.set(childNodes[i], parentNode);
-                        //var arrForFinish = [false]
-                        var tempPath = await DFS(grid, childNodes[i].split(",")[0], childNodes[i].split(",")[1], finishY, finishX, pathArray, arrLen, visitedNodes, finished,currNode);
-                        /* if (tempPath.length() < shortestLen) {
-                             shortestPath = tempPath;
-                             shortestLen = tempPath.length;
-                         }*/
+                        var tempPath = await DFS(grid, childNodes[i].split(",")[0], childNodes[i].split(",")[1], finishY, finishX, pathArray, arrLen, visitedNodes, finished, currNode);
                     }
                 }
             }
         }
-        alert("end");
         return pathArray;
+    }
+
+    async function BiBFS(grid, startY, startX, finishY, finishX) {
+        var connectY;
+        var connectX;
+        var prevFromStart = new Map();
+        var prevFromEnd = new Map();
+        var connected = false;
+        var holdVisitedStart = new Set();
+        var holdVisitedEnd = new Set();
+        var queueStart = new Queue();
+        var queueEnd = new Queue();
+        queueStart.enqueue(startY + "," + startX);
+        queueEnd.enqueue(finishY + "," + finishX);
+        while ((!queueStart.isEmpty() || !queueEnd.isEmpty()) && !connected) {
+            var startNode = undefined;//queueStart.dequeue();
+            var keepLooking = true;
+            while (keepLooking) {
+                startNode = queueStart.dequeue();
+                if ((!holdVisitedStart.has(startNode) && !connected) || startNode === undefined) {
+                    keepLooking = false;
+                }
+            }
+            if (!holdVisitedStart.has(startNode) && !connected) {
+               // alert("front thing");
+                await new Promise(done => setTimeout(() => done(), 100));
+                holdVisitedStart.add(startNode);
+                var splitCoords = startNode.split(",");
+                var holdDirectionsToGo = [];
+                var holdDirectionsPos = 0;
+
+                var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
+                var thingToEdit = document.getElementById(idName);
+                thingToEdit.style.backgroundColor = "yellow";
+                var yPos = splitCoords[0];
+                var xPos = splitCoords[1];
+                if (yPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) - 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(xPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) + 1);
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(yPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) + 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if (xPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) - 1);
+                    holdDirectionsPos++;
+                }
+                for (var i = 0; i < holdDirectionsPos; i++) {
+                    var childSplitCoords = holdDirectionsToGo[i].split(",");
+                    if (await getPointValue(childSplitCoords[0], childSplitCoords[1]) !== "WALL" && !holdVisitedStart.has(holdDirectionsToGo[i])) {
+                        var childToEnqueue = (childSplitCoords[0].toString() + "," + childSplitCoords[1].toString()).toString();
+                        queueStart.enqueue(childToEnqueue);
+                        prevFromStart.set(childToEnqueue, startNode);
+                    }
+                }
+                if (holdVisitedEnd.has(startNode)) {
+                    connected = true;
+                    connectY = yPos;
+                    connectX = xPos;
+                }
+            }
+            var endNode = undefined;//queueEnd.dequeue();
+            keepLooking = true;
+            while (keepLooking) {
+                endNode = queueEnd.dequeue();
+                if ((!holdVisitedEnd.has(endNode) && !connected) || endNode === undefined) {
+                    keepLooking = false;
+                }
+            }
+            if (!holdVisitedEnd.has(endNode) && !connected) {
+                //alert("end thing");
+                await new Promise(done => setTimeout(() => done(), 100));
+                holdVisitedEnd.add(endNode);
+                var splitCoords = endNode.split(",");
+                var holdDirectionsToGo = [];
+                var holdDirectionsPos = 0;
+
+                var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
+                var thingToEdit = document.getElementById(idName);
+                thingToEdit.style.backgroundColor = "blue";
+                var yPos = splitCoords[0];
+                var xPos = splitCoords[1];
+                if (yPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) - 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(xPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) + 1);
+                    holdDirectionsPos++;
+                }
+                if ((parseInt(yPos) + 1) < arr.length) {
+                    holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) + 1) + "," + xPos;
+                    holdDirectionsPos++;
+                }
+                if (xPos > 0) {
+                    holdDirectionsToGo[holdDirectionsPos] = yPos + "," + (parseInt(xPos) - 1);
+                    holdDirectionsPos++;
+                }
+                for (var i = 0; i < holdDirectionsPos; i++) {
+                    var childSplitCoords = holdDirectionsToGo[i].split(",");
+                    if (await getPointValue(childSplitCoords[0], childSplitCoords[1]) !== "WALL" && !holdVisitedEnd.has(holdDirectionsToGo[i])) {
+                        var childToEnqueue = (childSplitCoords[0].toString() + "," + childSplitCoords[1].toString()).toString();
+                        queueEnd.enqueue(childToEnqueue);
+                        prevFromEnd.set(childToEnqueue, endNode);
+                    }
+                }
+                if (holdVisitedStart.has(endNode)) {
+                    connected = true;
+                    connectY = yPos;
+                    connectX = xPos;
+                }
+            }
+        }
+        var path = reconstructPath(startY + "," + startX, connectY + "," + connectX, prevFromStart);
+        var secondPiecePath = [];
+        var posInSecondPath = 0;
+        var keepGoing = true;
+        var currThing = connectY + "," + connectX;
+        while (keepGoing) {
+            currThing = prevFromEnd.get(currThing);
+            if (currThing === undefined) {
+                keepGoing = false;
+            } else {
+                secondPiecePath[posInSecondPath] = currThing;
+                posInSecondPath++;
+            }
+        }
+        //var secondPath = [];
+
+        var lengthOfFirstPath = path.length;
+        var lengthOfSecondPath = posInSecondPath;
+        var finalPath = [];
+        var posInFinalPath = 0;
+        for(var a =0;a<lengthOfFirstPath;a++){
+            finalPath[posInFinalPath] = path[a];
+            posInFinalPath++;
+        }
+        for(var b=0;b<lengthOfSecondPath;b++){
+            finalPath[posInFinalPath] = secondPiecePath[b];
+            posInFinalPath++;
+        }
+        return finalPath;
     }
 
     async function BFS(grid, startY, startX, finishY, finishX) {
@@ -300,7 +408,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         while (!queue.isEmpty()) {
             var node = queue.dequeue();
             if (!holdVisited.has(node) && !found) {
-                await new Promise(done => setTimeout(() => done(), 500));
+                await new Promise(done => setTimeout(() => done(), 100));
                 holdVisited.add(node);
                 var splitCoords = node.split(",");
                 var holdDirectionsToGo = [];
@@ -363,7 +471,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         while (queue.length && !endFound) {
             var node = queue.shift();
             if (!holdVisited.has(node[1])) {
-                await new Promise(done => setTimeout(() => done(), 500));
+                await new Promise(done => setTimeout(() => done(), 100));
                 var holdNodePos = node[1].split(",");
                 var yPos = holdNodePos[0];
                 var xPos = holdNodePos[1];
@@ -419,9 +527,6 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                         newArrayToQueue[0] = distVal + lastDistFromStart;
                         newArrayToQueue[1] = thingToEnqueue;
                         queue.splice(locationInQueue, 0, newArrayToQueue);
-                        //var sizeOfQueue = queue.length;
-                        /*for (var b = 0; b < sizeOfQueue; b++) {
-                        }*/
                     }
                 }
             }
