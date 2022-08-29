@@ -7,13 +7,16 @@ import AlgorithmComponent from "./algorithmsDropdown";
 import AlgorithmsDropdown from "./algorithmsDropdown";
 import {usePrevious} from "react-use";
 
-const navbar = ({setState,setAlgoState,setButtonState,buttonState}) => {
+const navbar = ({setState,setAlgoState,setButtonState,buttonState,resetState,setResetState}) => {
     const updateLength = (event) =>{
         const inputVal = event.target.value;
         setState(inputVal);
     }
     const updateButtonState = (event) => {
         setButtonState(buttonState+1);
+    }
+    const updateResetState = (event) => {
+        setResetState(resetState+1);
     }
     return (
         <div className={"topBar"} id={"navBarTop"}>
@@ -29,7 +32,7 @@ const navbar = ({setState,setAlgoState,setButtonState,buttonState}) => {
                            placeholder="Border Length"/>
                 </form>
                 <button onClick={updateButtonState} className={"button"} id={"createButton"}>Visualize</button>
-                <button className={"button"}>Reset</button>
+                <button onClick={updateResetState} className={"button"}>Reset</button>
 
             </div>
 

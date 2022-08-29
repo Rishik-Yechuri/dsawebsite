@@ -21,12 +21,13 @@ function App() {
     const [state,setState] = useState(0);
     const [algoState,setAlgoState]= useState( "A*");
     const [buttonState,setButtonState]= useState( 0);
+    const[resetState,setResetState] = useState(0);
     return (
         <div id={"mainDiv"}>
             <ArrayNavBar></ArrayNavBar>
-            <Navbar setState={setState} setAlgoState={setAlgoState} setButtonState={setButtonState} buttonState={buttonState}></Navbar>
+            <Navbar setState={setState} setAlgoState={setAlgoState} setButtonState={setButtonState} buttonState={buttonState} resetState={resetState} setResetState={setResetState}></Navbar>
 
-            <MazeComponent state={state} algoState={algoState} buttonState={buttonState} setState={setState}></MazeComponent>
+            <MazeComponent state={state} algoState={algoState} buttonState={buttonState} setState={setState} resetState={resetState}></MazeComponent>
         </div>
     );
 }

@@ -6,7 +6,7 @@ import targetnode from "./targetnode.png"
 import Cookies from 'universal-cookie';
 
 
-const MazeComponent = ({state, algoState, buttonState, setState}) => {
+const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => {
     let yLocOfStart = 8;
     var lastGoodY;
     var lastGoodX;
@@ -35,6 +35,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         }
     });
     localStorage.setItem("arr", JSON.stringify(arr));
+    localStorage.setItem("searching", JSON.stringify(false));
     var holdPopups = document.getElementsByClassName("popUpContent");
     document.addEventListener('readystatechange', event => {
         if (event.target.readyState === "complete") {
@@ -74,6 +75,13 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         }
     }, [buttonState]);
 
+    useEffect(() => {
+        alert("HI:" + resetState);
+        if (resetState > 0) {
+            resetMaze();
+        }
+    }, [resetState]);
+
     async function drawPath(path) {
         var sizeOfPath = path.length;
         for (var x = 0; x < sizeOfPath; x++) {
@@ -83,6 +91,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             var thingToEdit = document.getElementById(idName);
             thingToEdit.style.backgroundColor = "green";
         }
+        localStorage.setItem("searching", JSON.stringify(false));
     }
 
     function delay(n) {
@@ -98,6 +107,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
     }
 
     async function startSearching() {
+        localStorage.setItem("searching", JSON.stringify(true));
         arr = JSON.parse(localStorage.getItem("arr"));
         var holdState = algoState.toString();
         if (holdState === "A*") {
@@ -274,7 +284,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                 }
             }
             if (!holdVisitedStart.has(startNode) && !connected) {
-               // alert("front thing");
+                // alert("front thing");
                 await new Promise(done => setTimeout(() => done(), 100));
                 holdVisitedStart.add(startNode);
                 var splitCoords = startNode.split(",");
@@ -388,11 +398,11 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         var lengthOfSecondPath = posInSecondPath;
         var finalPath = [];
         var posInFinalPath = 0;
-        for(var a =0;a<lengthOfFirstPath;a++){
+        for (var a = 0; a < lengthOfFirstPath; a++) {
             finalPath[posInFinalPath] = path[a];
             posInFinalPath++;
         }
-        for(var b=0;b<lengthOfSecondPath;b++){
+        for (var b = 0; b < lengthOfSecondPath; b++) {
             finalPath[posInFinalPath] = secondPiecePath[b];
             posInFinalPath++;
         }
@@ -568,8 +578,9 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             setStartPointXState(xCoord);
             localStorage.setItem("starty", JSON.stringify(yCoord));
             localStorage.setItem("startx", JSON.stringify(xCoord));
-        } else if (arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START" || newVal === "EMPTY") {
+        } else if ((arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START") || newVal === "EMPTY") {
             innerImg.style.display = 'none';
+            innerCell.classList.remove('wallCell');
             if (newVal === "WALL") {
                 if (arr[yCoord][xCoord] === "WALL" && !dontChange) {
                     innerCell.classList.remove('wallCell');
@@ -617,6 +628,19 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
         setPointValue(holdLoc[0], holdLoc[1], "WALL");
     }
 
+    function resetMaze() {
+        var lengthOfArray = arr.length;
+        for (var y = 0; y < lengthOfArray; y++) {
+            for (var x = 0; x < lengthOfArray; x++) {
+                var pointVal = getPointValue(y, x);
+                if (!(pointVal === "END" || pointVal === "START")) {
+                setPointValue(y,x,"EMPTY",false);
+                }
+            }
+
+        }
+    }
+
     function createMaze(length) {
         var arrayDiffSize = false;
         arr = JSON.parse(localStorage.getItem("arr"));
@@ -655,72 +679,78 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
                 insideElement.id = "innerCell" + y + "X" + x;
                 insideElement.className = "innerCell";
                 insideElement.onmouseenter = (ev) => {
-                    if (mouseDown === 1) {
-                        var thingClicked = ev.target.id.replaceAll("I", "");
-                        var thing = document.getElementById(thingClicked);
-                        if (draggingItemMode) {
-                            thing.classList.remove('wallCell');
-                            var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
-                            var imgId;
-                            if ((arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END")) {
-                                holdLoc[0] = lastGoodY;
-                                holdLoc[1] = lastGoodX;
+                    if (JSON.parse(localStorage.getItem("searching")) === false) {
+                        if (mouseDown === 1) {
+                            var thingClicked = ev.target.id.replaceAll("I", "");
+                            var thing = document.getElementById(thingClicked);
+                            if (draggingItemMode) {
+                                thing.classList.remove('wallCell');
+                                var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                                var imgId;
+                                if ((arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END")) {
+                                    holdLoc[0] = lastGoodY;
+                                    holdLoc[1] = lastGoodX;
+                                } else {
+                                    ev.target.classList.add('dragCell');
+                                }
+                                imgId = "innerCell" + holdLoc[0] + "X" + holdLoc[1] + "I";
+                                var innerImg = document.getElementById(imgId);
+                                if (itemBeingDragged === "START") {
+                                    innerImg.src = startingarrow;
+                                    innerImg.style.width = '60%';
+                                } else if (itemBeingDragged === "END") {
+                                    innerImg.src = targetnode;
+                                    innerImg.style.width = '65%';
+                                }
+                                innerImg.style.display = 'block';
                             } else {
-                                ev.target.classList.add('dragCell');
+                                changeTile(ev)
                             }
-                            imgId = "innerCell" + holdLoc[0] + "X" + holdLoc[1] + "I";
-                            var innerImg = document.getElementById(imgId);
-                            if (itemBeingDragged === "START") {
-                                innerImg.src = startingarrow;
-                                innerImg.style.width = '60%';
-                            } else if (itemBeingDragged === "END") {
-                                innerImg.src = targetnode;
-                                innerImg.style.width = '65%';
-                            }
-                            innerImg.style.display = 'block';
-                        } else {
-                            changeTile(ev)
                         }
+                        localStorage.setItem("arr", JSON.stringify(arr));
                     }
-                    localStorage.setItem("arr", JSON.stringify(arr));
                 }
                 insideElement.onmouseleave = (ev) => {
-                    if (mouseDown === 1) {
-                        if (draggingItemMode) {
-                            var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
-                            if ((itemBeingDragged === "START" && arr[holdLoc[0]][holdLoc[1]] !== "END") || (itemBeingDragged === "END" && arr[holdLoc[0]][holdLoc[1]] !== "START")) {
-                                if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
-                                    setPointValue(holdLoc[0], holdLoc[1], "EMPTY");
+                    if (JSON.parse(localStorage.getItem("searching")) === false) {
+                        if (mouseDown === 1) {
+                            if (draggingItemMode) {
+                                var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                                if ((itemBeingDragged === "START" && arr[holdLoc[0]][holdLoc[1]] !== "END") || (itemBeingDragged === "END" && arr[holdLoc[0]][holdLoc[1]] !== "START")) {
+                                    if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
+                                        setPointValue(holdLoc[0], holdLoc[1], "EMPTY");
+                                    } else {
+                                        setPointValue(holdLoc[0], holdLoc[1], arr[holdLoc[0]][holdLoc[1]], true);
+                                    }
+                                    lastGoodY = holdLoc[0];
+                                    lastGoodX = holdLoc[1];
                                 } else {
-                                    setPointValue(holdLoc[0], holdLoc[1], arr[holdLoc[0]][holdLoc[1]], true);
+                                    setPointValue(lastGoodY, lastGoodX, arr[lastGoodY][lastGoodX], true);
                                 }
-                                lastGoodY = holdLoc[0];
-                                lastGoodX = holdLoc[1];
-                            } else {
-                                setPointValue(lastGoodY, lastGoodX, arr[lastGoodY][lastGoodX], true);
                             }
                         }
+                        localStorage.setItem("arr", JSON.stringify(arr));
                     }
-                    localStorage.setItem("arr", JSON.stringify(arr));
                 }
                 insideElement.onmousedown = e => {
-                    if (e.button === 2) {
-                        var thingClicked = e.target.id.replaceAll("I", "");
-                        var thing = document.getElementById(thingClicked);
-                        var holdLoc = e.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
-                        if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
-                            draggingItemMode = true;
-                            thing.classList.add('dragCell');
-                            if (arr[holdLoc[0]][holdLoc[1]] === "START") {
-                                itemBeingDragged = "START";
-                            } else if (arr[holdLoc[0]][holdLoc[1]]) {
-                                itemBeingDragged = "END";
+                    if (JSON.parse(localStorage.getItem("searching")) === false) {
+                        if (e.button === 2) {
+                            var thingClicked = e.target.id.replaceAll("I", "");
+                            var thing = document.getElementById(thingClicked);
+                            var holdLoc = e.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
+                            if (arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END") {
+                                draggingItemMode = true;
+                                thing.classList.add('dragCell');
+                                if (arr[holdLoc[0]][holdLoc[1]] === "START") {
+                                    itemBeingDragged = "START";
+                                } else if (arr[holdLoc[0]][holdLoc[1]]) {
+                                    itemBeingDragged = "END";
+                                }
+                            } else {
+                                changeTile(e);
                             }
-                        } else {
-                            changeTile(e);
                         }
+                        localStorage.setItem("arr", JSON.stringify(arr));
                     }
-                    localStorage.setItem("arr", JSON.stringify(arr));
                 }
                 insideElement.onmouseup = e => {
                     if (e.button === 2) {
@@ -764,6 +794,7 @@ const MazeComponent = ({state, algoState, buttonState, setState}) => {
             }
             document.getElementById("mazeHolderDiv").appendChild(element);
         }
+
         localStorage.setItem("arr", JSON.stringify(arr));
         if (!arrayDiffSize) {
             for (y = 0; y < length; y++) {
