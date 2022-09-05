@@ -1,9 +1,23 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './navbarcss.css';
 import DropdownComponent from "./dropdownComponent";
 import ArrayAlgorithmComponent from "./ArrayAlgorithmComponent";
+const ArrayNavBar = ({setArrayReset,arrayReset,setArraySort,arraySort,setArraySortMethod}) => {
+   // const [setArraySortMethod, arraySortMethod] = useState("Merge");
 
-const ArrayNavBar = () => {
+    const updateArrayResetState = (event) => {
+        setArrayReset(arrayReset+1);
+    }
+    const updateArraySortState = (event) => {
+        setArraySort(arraySort+1);
+    }
+    /*useEffect(() => {
+        if(arraySortMethod.toString() === "Merge"){
+
+        }else if(arraySortMethod.toString() === "Quick"){
+
+        }
+    }, [arraySortMethod]);*/
     return (
         <div className={"topBar"} id={"arrayNavBarTop"}>
             <div className={"halfDiv"} id={"topDiv"}>
@@ -12,10 +26,10 @@ const ArrayNavBar = () => {
                     <DropdownComponent/>
                 </div>
                 <div className={"dropdown2"}>
-                    <ArrayAlgorithmComponent/>
+                    <ArrayAlgorithmComponent setArraySortMethod={setArraySortMethod}/>
                     </div>
-                <button className={"button"} id={"createButton"}>Sort</button>
-                <button className={"button"} >Reset</button>
+                <button onClick={updateArraySortState} className={"button"} id={"createButton"}>Sort</button>
+                <button onClick={updateArrayResetState} className={"button"} >Reset</button>
 
             </div>
         </div>

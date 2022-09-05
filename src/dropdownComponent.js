@@ -45,11 +45,17 @@ const dropdownComponent = () => {
         }
         document.getElementsByClassName("structureDropdown").textContent = "Structure:" + newText;
         if(newText === "Array"){
+            //document.getElementById("arrayTopDiv").style.display = 'block';
+            //alert("HEREBOIS");
             document.getElementById("arrayNavBarTop").style.display = 'block';
             document.getElementById("navBarTop").style.display = 'none';
+            document.getElementById("arrayTopDiv").style.removeProperty('display');// = 'block';
+            document.getElementById("mazeTopDiv").style.display = 'none';
         }else{
             document.getElementById("arrayNavBarTop").style.display = 'none';
             document.getElementById("navBarTop").style.display = 'block';
+            document.getElementById("arrayTopDiv").style.display = 'none';
+            document.getElementById("mazeTopDiv").style.removeProperty('display');// = 'block';
         }
     }
     return (

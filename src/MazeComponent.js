@@ -35,14 +35,13 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
         }
     });
     localStorage.setItem("arr", JSON.stringify(arr));
-    localStorage.setItem("searching", JSON.stringify(false));
+    //localStorage.setItem("searching", "false");
     var holdPopups = document.getElementsByClassName("popUpContent");
     document.addEventListener('readystatechange', event => {
         if (event.target.readyState === "complete") {
             popupLoaded();
         }
     });
-
     var gridSize = state;
     arr = JSON.parse(localStorage.getItem("arr"));
     if (arr !== null) {
@@ -76,9 +75,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
     }, [buttonState]);
 
     useEffect(() => {
-        alert("HI:" + resetState);
         if (resetState > 0) {
-            resetMaze();
+            resetMaze(false);
         }
     }, [resetState]);
 
@@ -89,9 +87,12 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
             var holdCoords = path[x].split(",");
             var idName = "innerCell" + holdCoords[0] + "X" + holdCoords[1];
             var thingToEdit = document.getElementById(idName);
-            thingToEdit.style.backgroundColor = "green";
+            //thingToEdit.style.backgroundColor = "green";
+            thingToEdit.classList.remove('searchedPathCell');
+            thingToEdit.classList.remove('biPathCell');
+            thingToEdit.classList.add('finalPathCell');
         }
-        localStorage.setItem("searching", JSON.stringify(false));
+        localStorage.setItem("searching", "false");
     }
 
     function delay(n) {
@@ -107,7 +108,11 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
     }
 
     async function startSearching() {
-        localStorage.setItem("searching", JSON.stringify(true));
+        if(localStorage.getItem("searching") !== "true"){
+            resetMaze(true);
+
+            localStorage.setItem("searching", "true");
+        //alert("SETTO:" + localStorage.getItem("searching"));
         arr = JSON.parse(localStorage.getItem("arr"));
         var holdState = algoState.toString();
         if (holdState === "A*") {
@@ -127,6 +132,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
             const path = await BiBFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
             await drawPath(path);
         }
+    }
     }
 
     class Queue {
@@ -234,7 +240,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
             await new Promise(done => setTimeout(() => done(), 200));
             var idName = "innerCell" + currY + "X" + currX;
             var thingToEdit = document.getElementById(idName);
-            thingToEdit.style.backgroundColor = "yellow";
+            //thingToEdit.style.backgroundColor = "yellow";
+            thingToEdit.classList.add('searchedPathCell');
             var childNodes = new Array();
 
             if (!visitedNodes.has((parseInt(currY) - 1) + "," + currX) && parseInt(currY) - 1 >= 0) {
@@ -293,7 +300,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
 
                 var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
                 var thingToEdit = document.getElementById(idName);
-                thingToEdit.style.backgroundColor = "yellow";
+                //thingToEdit.style.backgroundColor = "yellow";
+                thingToEdit.classList.add('searchedPathCell');
                 var yPos = splitCoords[0];
                 var xPos = splitCoords[1];
                 if (yPos > 0) {
@@ -344,7 +352,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
 
                 var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
                 var thingToEdit = document.getElementById(idName);
-                thingToEdit.style.backgroundColor = "blue";
+                //thingToEdit.style.backgroundColor = "blue";
+                thingToEdit.classList.add('biPathCell');
                 var yPos = splitCoords[0];
                 var xPos = splitCoords[1];
                 if (yPos > 0) {
@@ -428,7 +437,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 }
                 var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
                 var thingToEdit = document.getElementById(idName);
-                thingToEdit.style.backgroundColor = "yellow";
+                //thingToEdit.style.backgroundColor = "yellow";
+                thingToEdit.classList.add('searchedPathCell');
                 var yPos = splitCoords[0];
                 var xPos = splitCoords[1];
                 if (yPos > 0) {
@@ -495,7 +505,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 var thingToEdit = document.getElementById(idName);
                 thingToEnqueue = yPos + "," + xPos;
                 holdVisited.add(thingToEnqueue);
-                thingToEdit.style.backgroundColor = "yellow";
+                //thingToEdit.style.backgroundColor = "yellow";
+                thingToEdit.classList.add('searchedPathCell');
                 if (yPos > 0) {
                     holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) - 1) + "," + xPos;
                     holdDirectionsPos++;
@@ -553,7 +564,11 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
         var innerImg = document.getElementById(imgId);
         innerCell.classList.remove('dragCell');
         innerCell.classList.remove('majorPointCell');
+        var containsPath = (innerCell.classList.contains("searchedPathCell") || innerCell.classList.contains("finalPathCell") || innerCell.classList.contains("biPathCell"));
         if (newVal === "END" && arr[yCoord][xCoord] !== "START") {
+            if(containsPath){
+                resetMaze(true);
+            }
             //innerCell.style.backgroundColor = "red";
             innerCell.classList.add('majorPointCell');
             innerImg.src = targetnode;
@@ -570,6 +585,9 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 imgId = "innerCell" + lastGoodY + "X" + lastGoodX + "I";
                 innerImg = document.getElementById(imgId);
             }
+            if(containsPath){
+                resetMaze(true);
+            }
             innerCell.classList.add('majorPointCell');
             innerImg.src = startingarrow;
             innerImg.style.display = 'block';
@@ -581,7 +599,11 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
         } else if ((arr[yCoord][xCoord] !== "END" && arr[yCoord][xCoord] !== "START") || newVal === "EMPTY") {
             innerImg.style.display = 'none';
             innerCell.classList.remove('wallCell');
+            var containsPath = (innerCell.classList.contains("searchedPathCell") || innerCell.classList.contains("finalPathCell") || innerCell.classList.contains("biPathCell"));
             if (newVal === "WALL") {
+                if(containsPath){
+                    resetMaze(true);
+                }
                 if (arr[yCoord][xCoord] === "WALL" && !dontChange) {
                     innerCell.classList.remove('wallCell');
                     arr[yCoord][xCoord] = "EMPTY";
@@ -590,9 +612,10 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                     innerCell.classList.add('wallCell');
                 }
             } else if (newVal === "PATH") {
-                innerCell.style.backgroundColor = "yellow";
+                //innerCell.style.backgroundColor = "yellow";
+               // innerCell.classList.add('searchedPathCell');
             } else if (newVal === "FINALPATH") {
-                innerCell.style.backgroundColor = "lawngreen";
+                innerCell.style.backgroundColor = "purple";
             } else {
                 innerImg.style.display = 'none';
             }
@@ -628,17 +651,31 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
         setPointValue(holdLoc[0], holdLoc[1], "WALL");
     }
 
-    function resetMaze() {
+    function resetMaze(justPath) {
+        //alert("searching:" + localStorage.getItem("searching"));
+        if(localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null){
+           // alert("PASSCHECK");
         var lengthOfArray = arr.length;
         for (var y = 0; y < lengthOfArray; y++) {
             for (var x = 0; x < lengthOfArray; x++) {
                 var pointVal = getPointValue(y, x);
-                if (!(pointVal === "END" || pointVal === "START")) {
-                setPointValue(y,x,"EMPTY",false);
+                if (!(pointVal === "END" || pointVal === "START") && !justPath) {
+                    setPointValue(y, x, "EMPTY", false);
+                    /*var idName = "innerCell" + y + "X" + x;
+                    var pointToRemoveColorFrom = document.getElementById(idName);
+                    pointToRemoveColorFrom.classList.remove('searchedPathCell');
+                    pointToRemoveColorFrom.classList.remove('finalPathCell');*/
                 }
+                var idName = "innerCell" + y + "X" + x;
+                var pointToRemoveColorFrom = document.getElementById(idName);
+                pointToRemoveColorFrom.classList.remove('searchedPathCell');
+                pointToRemoveColorFrom.classList.remove('finalPathCell');
+                pointToRemoveColorFrom.classList.remove('biPathCell');
+
             }
 
         }
+    }
     }
 
     function createMaze(length) {
@@ -679,7 +716,8 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 insideElement.id = "innerCell" + y + "X" + x;
                 insideElement.className = "innerCell";
                 insideElement.onmouseenter = (ev) => {
-                    if (JSON.parse(localStorage.getItem("searching")) === false) {
+                    //alert(localStorage.getItem("searching"));
+                    if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (mouseDown === 1) {
                             var thingClicked = ev.target.id.replaceAll("I", "");
                             var thing = document.getElementById(thingClicked);
@@ -711,7 +749,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                     }
                 }
                 insideElement.onmouseleave = (ev) => {
-                    if (JSON.parse(localStorage.getItem("searching")) === false) {
+                    if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (mouseDown === 1) {
                             if (draggingItemMode) {
                                 var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
@@ -732,7 +770,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                     }
                 }
                 insideElement.onmousedown = e => {
-                    if (JSON.parse(localStorage.getItem("searching")) === false) {
+                    if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (e.button === 2) {
                             var thingClicked = e.target.id.replaceAll("I", "");
                             var thing = document.getElementById(thingClicked);
@@ -758,7 +796,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                         var thing = document.getElementById(thingClicked);
                         if (draggingItemMode) {
                             var holdLoc = e.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
-                            if ((arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END")) {
+                            if ((itemBeingDragged !== "START" && arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END" && itemBeingDragged!=="END")) {
                                 if (lastGoodY === undefined || lastGoodX === undefined) {
                                     if (arr[holdLoc[0]][holdLoc[1]] === "START") {
                                         holdLoc[0] = yLocOfStart;

@@ -1,24 +1,65 @@
-#mainDiv {
+/*#mainDiv {
     height: 100%;
     max-height: 100%;
     display: flex;
     flex-direction: column;
-}
+}*/
 
-#mazeTopDiv {
+#arrayTopDiv {
     width: 100%;
     height: 100%;
     max-height: 100%;
-    background-color: #61dafb;
+    background-color: greenyellow;
     display: flex;
+    align-items: center;
     justify-content: center;
+    vertical-align: center;
     overflow: hidden;
-}
 
+}
+#arrayHolderDiv{
+    display: flex;
+    flex-wrap: wrap;
+    width: 58em;
+    height: fit-content;
+    align-content: center;
+    vertical-align: center;
+    background-color: darkorange;
+}
+#arrayBarHolder{
+    width: 58em;
+    height: 40em;
+    background-color: hotpink;
+    display: flex;
+    flex-direction: row;
+    vertical-align: center;
+}
+#arrayBottomLine{
+    width: 58em;
+    height: .35em;
+    background-color: mediumpurple;
+}
+.heightBar{
+    width: .48em;
+    margin-left: .05em;
+    margin-right: .05em;
+    align-self: flex-end;
+    background-color: crimson;
+}
+.NONE{
+    background-color: crimson;
+}
+.SEARCHING{
+    background-color: yellow;
+}
+.FINISHED{
+    background-color: green;
+}
+/*
 #mazeHolderDiv {
     width: fit-content;
     height: fit-content;
- /*   background-color: green;*/
+    !*   background-color: green;*!
     transform: scale(1);
 }
 
@@ -35,11 +76,11 @@ Draggable {
     width: 2.95em;
     height: 2.95em;
     border-style: solid;
-    border-color: yellow;
+    border-color: whitesmoke;
     background-position: center;
     background-repeat: no-repeat;
     background-size: 70%;
-    background-color: red;
+    background-color: purple;
     align-self: center;
     align-items: center;
     display: flex;
@@ -54,7 +95,7 @@ div.dragCell{
     background-color: hotpink;
 }
 div.dragCell:hover{
- background-color: orange;
+    background-color: orange;
 }
 .wallCell{
     background-color: black;
@@ -62,18 +103,9 @@ div.dragCell:hover{
 .majorPointCell{
     background-color: red;
 }
-.finalPathCell{
-    background-color: lawngreen;
-}
-.searchedPathCell{
-    background-color: yellow;
-}
-.biPathCell{
-    background-color: blue;
-}
-/*.hoverCell{
+!*.hoverCell{
     background-color: orange;
-}*/
+}*!
 
 
 .popUpContent {
@@ -127,3 +159,4 @@ html, body, #root, .App {
     max-height: 100%;
     margin: 0;
 }
+*/
