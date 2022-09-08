@@ -11,13 +11,6 @@ const ArrayNavBar = ({setArrayReset,arrayReset,setArraySort,arraySort,setArraySo
     const updateArraySortState = (event) => {
         setArraySort(arraySort+1);
     }
-    /*useEffect(() => {
-        if(arraySortMethod.toString() === "Merge"){
-
-        }else if(arraySortMethod.toString() === "Quick"){
-
-        }
-    }, [arraySortMethod]);*/
     return (
         <div className={"topBar"} id={"arrayNavBarTop"}>
             <div className={"halfDiv"} id={"topDiv"}>
