@@ -3,65 +3,61 @@ import dropDown from "./dropdown.png";
 import './navbarcss.css';
 
 
-
 const dropdownComponent = () => {
+    //Tracks if dropdown is activated
     var dropDownActivated = false;
-    document.addEventListener("click",function (event){
-        if(event.target.closest(".screenSwitchDropdown")){
+    //Listens for click
+    document.addEventListener("click", function (event) {
+        if (event.target.closest(".screenSwitchDropdown")) {
             return;
-        }else{
-           // document.getElementById("firstContent").style.display = 'none';
+        } else {
             var holdDropdowns = document.getElementsByClassName("majorDropdown");
-            for(var x=0;x<holdDropdowns.length;x++){
+            for (var x = 0; x < holdDropdowns.length; x++) {
                 (holdDropdowns.item(x)).style.display = 'none';
             }
             dropDownActivated = false;
         }
     })
+    //Updates dropdown
     function structureDropdown() {
         var holdDropdowns = document.getElementsByClassName("majorDropdown");
         if (dropDownActivated) {
-            for(var x=0;x<holdDropdowns.length;x++){
+            for (var x = 0; x < holdDropdowns.length; x++) {
                 (holdDropdowns.item(x)).style.display = 'none';
             }
-/*
-            document.getElementById("firstContent").style.display = 'none';
-*/
         }
         if (!dropDownActivated) {
-            for(var x=0;x<holdDropdowns.length;x++){
+            for (var x = 0; x < holdDropdowns.length; x++) {
                 (holdDropdowns.item(x)).style.display = 'block';
             }
-           // document.getElementById("firstContent").style.display = 'block';
         }
+        //Updates dropdown state
         dropDownActivated = !dropDownActivated;
 
     }
-    function updateDropdownText(newText){
-        //alert(document.getElementsByClassName("structureDropdown"));
+    //Change text for dropdown
+    function updateDropdownText(newText) {
         var elements = document.getElementsByClassName("structureDropdown");
-        for(var x=0;x<elements.length;x++){
+        for (var x = 0; x < elements.length; x++) {
             elements.item(x).textContent = "Structure:" + newText;
         }
         document.getElementsByClassName("structureDropdown").textContent = "Structure:" + newText;
-        if(newText === "Array"){
-            //document.getElementById("arrayTopDiv").style.display = 'block';
-            //alert("HEREBOIS");
+        if (newText === "Array") {
             document.getElementById("arrayNavBarTop").style.display = 'block';
             document.getElementById("navBarTop").style.display = 'none';
             document.getElementById("arrayTopDiv").style.removeProperty('display');// = 'block';
             document.getElementById("mazeTopDiv").style.display = 'none';
-        }else{
+        } else {
             document.getElementById("arrayNavBarTop").style.display = 'none';
             document.getElementById("navBarTop").style.display = 'block';
             document.getElementById("arrayTopDiv").style.display = 'none';
             document.getElementById("mazeTopDiv").style.removeProperty('display');// = 'block';
         }
     }
-    return (
 
+    return (
         <>
-            <div onClick={structureDropdown}  className={"screenSwitchDropdown"} id={"dropdownDiv"}>
+            <div onClick={structureDropdown} className={"screenSwitchDropdown"} id={"dropdownDiv"}>
                 <text className={"structureDropdown"} id={"structText"}>Structure:Maze</text>
                 <img src={dropDown} id={"dropdownImg"}/>
             </div>

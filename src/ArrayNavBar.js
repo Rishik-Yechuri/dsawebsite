@@ -3,11 +3,11 @@ import './navbarcss.css';
 import DropdownComponent from "./dropdownComponent";
 import ArrayAlgorithmComponent from "./ArrayAlgorithmComponent";
 const ArrayNavBar = ({setArrayReset,arrayReset,setArraySort,arraySort,setArraySortMethod}) => {
-   // const [setArraySortMethod, arraySortMethod] = useState("Merge");
-
+    //Updates reset state when reset is clicked
     const updateArrayResetState = (event) => {
         setArrayReset(arrayReset+1);
     }
+    //Updates sort state when sort is clicked
     const updateArraySortState = (event) => {
         setArraySort(arraySort+1);
     }

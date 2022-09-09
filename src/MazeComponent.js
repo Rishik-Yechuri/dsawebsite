@@ -3,10 +3,10 @@ import "./mazeComponentStyle.css"
 import Draggable from "react-draggable";
 import startingarrow from "./startingarrow.png";
 import targetnode from "./targetnode.png"
-import Cookies from 'universal-cookie';
 
 
 const MazeComponent = ({state, algoState, buttonState, setState, resetState}) => {
+    //Creates variables
     let yLocOfStart = 8;
     var lastGoodY;
     var lastGoodX;
@@ -24,6 +24,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
     //var endPointX = 0;
     const [endPointXState, setEndPointXState] = useState(0);
     var arr = JSON.parse(localStorage.getItem("arr"));
+    //Sets listeners
     window.addEventListener('mousedown', (event) => {
         if (event.button === 2) {
             mouseDown = 1;
@@ -35,13 +36,13 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         }
     });
     localStorage.setItem("arr", JSON.stringify(arr));
-    //localStorage.setItem("searching", "false");
     var holdPopups = document.getElementsByClassName("popUpContent");
     document.addEventListener('readystatechange', event => {
         if (event.target.readyState === "complete") {
             popupLoaded();
         }
     });
+    //Checks if array exists
     var gridSize = state;
     arr = JSON.parse(localStorage.getItem("arr"));
     if (arr !== null) {
@@ -49,6 +50,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
     } else {
         gridSize = 4;
     }
+    //Creates state for zoom
     let [zoomSize, setZoomSize] = useState({zoomSize: 1});
     var mazeHolderDiv = document.getElementById("mazeHolderDiv");
     var zoom = (event) => {
@@ -58,6 +60,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         zoomSize.zoomSize = Math.min(Math.max(.1, tempZoomSize), 1000000)
         mazeHolderDiv.style.transform = `scale(${zoomSize.zoomSize})`;
     }
+    //Creates maze if state size changes
     useEffect(() => {
         arr = JSON.parse(localStorage.getItem("arr"));
         if (state > 1) {
@@ -68,18 +71,20 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
     }, [state]);
     useEffect(() => {
     }, [algoState]);
+    //Searches when visualize is clicked
     useEffect(() => {
         if (buttonState > 0) {
             startSearching();
         }
     }, [buttonState]);
-
+    //Resets maze when reset is clicked
     useEffect(() => {
         if (resetState > 0) {
             resetMaze(false);
         }
     }, [resetState]);
 
+    //Draws final path in green
     async function drawPath(path) {
         var sizeOfPath = path.length;
         for (var x = 0; x < sizeOfPath; x++) {
@@ -87,7 +92,6 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
             var holdCoords = path[x].split(",");
             var idName = "innerCell" + holdCoords[0] + "X" + holdCoords[1];
             var thingToEdit = document.getElementById(idName);
-            //thingToEdit.style.backgroundColor = "green";
             thingToEdit.classList.remove('searchedPathCell');
             thingToEdit.classList.remove('biPathCell');
             thingToEdit.classList.add('finalPathCell');
@@ -95,25 +99,13 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         localStorage.setItem("searching", "false");
     }
 
-    function delay(n) {
-        n = n || 2000;
-        return new Promise(done => {
-            setTimeout(() => {
-                done();
-            }, n);
-        });
-    }
-
-    function pause() {
-    }
-
+    //Calls search algorithm based on what is selected
     async function startSearching() {
         if (localStorage.getItem("searching") !== "true") {
             resetMaze(true);
-
             localStorage.setItem("searching", "true");
-            //alert("SETTO:" + localStorage.getItem("searching"));
             arr = JSON.parse(localStorage.getItem("arr"));
+            //Gets what algorithm is selected
             var holdState = algoState.toString();
             if (holdState === "A*") {
                 arr = JSON.parse(localStorage.getItem("arr"));
@@ -126,7 +118,6 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 var set = new Set();
                 var arrForFinish = [false];
                 const path = await DFSCaller(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")), new Map(), arr.length, set, arrForFinish, undefined);
-                //return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
                 await drawPath(path);
             } else if (holdState === "Bidirectional") {
                 const path = await BiBFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
@@ -134,7 +125,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
             }
         }
     }
-
+    //Used in the algorithms
     class Queue {
         constructor() {
             this.elements = {};
@@ -166,7 +157,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
             return this.length === 0;
         }
     }
-
+    //Given start point,end point,and hashmap of points and their previous node,recreated path
     function reconstructPath(start, end, prev) {
         var path = [];
         var pathPos = 0;
@@ -198,52 +189,32 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         }
         return low;
     }
-
-    function binarySearch(sortedArray, key) {
-        let start = 0;
-        let end = sortedArray.length - 1;
-
-        while (start <= end) {
-            let middle = Math.floor((start + end) / 2);
-
-            if (sortedArray[middle][0] === key) {
-                // found the key
-                return middle;
-            } else if (sortedArray[middle] < key) {
-                // continue searching to the right
-                start = middle + 1;
-            } else {
-                // search searching to the left
-                end = middle - 1;
-            }
-        }
-        // key wasn't found
-        return -1;
-    }
-
+    //Calls Depth First Search
     async function DFSCaller(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished, parentNode) {
         var pathArray = await DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished, parentNode);
         return reconstructPath((currY + "," + currX), (finishY + "," + finishX), pathArray);
-
     }
 
     async function DFS(grid, currY, currX, finishY, finishX, pathArray, arrLen, visitedNodes, finished, parentNode) {
         if (!finished[0]) {
+            //Creates variables
             var shortestPath = pathArray;
             var shortestLen = Number.MAX_VALUE;
             var currNode = currY + "," + currX;
             pathArray.set(currNode, parentNode);
+            //Checks if it is finished searching
             if (parseInt(finishY) === parseInt(currY) && parseInt(finishX) === parseInt(currX)) {
                 finished[0] = true;
             }
+            //Add current node to list
             visitedNodes.add(currNode);
+            //Wait
             await new Promise(done => setTimeout(() => done(), 200));
             var idName = "innerCell" + currY + "X" + currX;
             var thingToEdit = document.getElementById(idName);
-            //thingToEdit.style.backgroundColor = "yellow";
             thingToEdit.classList.add('searchedPathCell');
+            //Add children to array
             var childNodes = new Array();
-
             if (!visitedNodes.has((parseInt(currY) - 1) + "," + currX) && parseInt(currY) - 1 >= 0) {
                 childNodes.push((parseInt(currY) - 1) + "," + currX);
             }
@@ -268,8 +239,9 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         }
         return pathArray;
     }
-
+    //Bidirectional breadth first search
     async function BiBFS(grid, startY, startX, finishY, finishX) {
+        //Creates variables
         var connectY;
         var connectX;
         var prevFromStart = new Map();
@@ -281,6 +253,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         var queueEnd = new Queue();
         queueStart.enqueue(startY + "," + startX);
         queueEnd.enqueue(finishY + "," + finishX);
+        //Keeps going until paths have met
         while ((!queueStart.isEmpty() || !queueEnd.isEmpty()) && !connected) {
             var startNode = undefined;//queueStart.dequeue();
             var keepLooking = true;
@@ -290,8 +263,8 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                     keepLooking = false;
                 }
             }
+            //Does breadth first search for one node from start
             if (!holdVisitedStart.has(startNode) && !connected) {
-                // alert("front thing");
                 await new Promise(done => setTimeout(() => done(), 100));
                 holdVisitedStart.add(startNode);
                 var splitCoords = startNode.split(",");
@@ -342,8 +315,8 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                     keepLooking = false;
                 }
             }
+            //Does breadth first search for one node from the end
             if (!holdVisitedEnd.has(endNode) && !connected) {
-                //alert("end thing");
                 await new Promise(done => setTimeout(() => done(), 100));
                 holdVisitedEnd.add(endNode);
                 var splitCoords = endNode.split(",");
@@ -380,6 +353,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                         prevFromEnd.set(childToEnqueue, endNode);
                     }
                 }
+                //Check if paths touched
                 if (holdVisitedStart.has(endNode)) {
                     connected = true;
                     connectY = yPos;
@@ -387,11 +361,13 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 }
             }
         }
+        //Reconstructs first piece of path
         var path = reconstructPath(startY + "," + startX, connectY + "," + connectX, prevFromStart);
         var secondPiecePath = [];
         var posInSecondPath = 0;
         var keepGoing = true;
         var currThing = connectY + "," + connectX;
+        //Creates second piece of path(path from end)
         while (keepGoing) {
             currThing = prevFromEnd.get(currThing);
             if (currThing === undefined) {
@@ -401,12 +377,12 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 posInSecondPath++;
             }
         }
-        //var secondPath = [];
-
+        //Gets length for paths
         var lengthOfFirstPath = path.length;
         var lengthOfSecondPath = posInSecondPath;
         var finalPath = [];
         var posInFinalPath = 0;
+        //Combines them
         for (var a = 0; a < lengthOfFirstPath; a++) {
             finalPath[posInFinalPath] = path[a];
             posInFinalPath++;
@@ -424,8 +400,10 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         var holdVisited = new Set();
         var queue = new Queue();
         queue.enqueue(startY + "," + startX);
+        //Keeps searching while there are nodes to explore
         while (!queue.isEmpty()) {
             var node = queue.dequeue();
+            //Checks if the end has been found
             if (!holdVisited.has(node) && !found) {
                 await new Promise(done => setTimeout(() => done(), 100));
                 holdVisited.add(node);
@@ -437,7 +415,6 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 }
                 var idName = "innerCell" + splitCoords[0] + "X" + splitCoords[1];
                 var thingToEdit = document.getElementById(idName);
-                //thingToEdit.style.backgroundColor = "yellow";
                 thingToEdit.classList.add('searchedPathCell');
                 var yPos = splitCoords[0];
                 var xPos = splitCoords[1];
@@ -467,6 +444,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 }
             }
         }
+        //Reconstructs path
         return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
     }
 
@@ -489,8 +467,11 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         var holdVisited = new Set();
         var prev = new Map();
         while (queue.length && !endFound) {
+            //Get next node
             var node = queue.shift();
+            //Check if node has been visited
             if (!holdVisited.has(node[1])) {
+                //Wait
                 await new Promise(done => setTimeout(() => done(), 100));
                 var holdNodePos = node[1].split(",");
                 var yPos = holdNodePos[0];
@@ -505,8 +486,8 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 var thingToEdit = document.getElementById(idName);
                 thingToEnqueue = yPos + "," + xPos;
                 holdVisited.add(thingToEnqueue);
-                //thingToEdit.style.backgroundColor = "yellow";
                 thingToEdit.classList.add('searchedPathCell');
+                //Adds children to array
                 if (yPos > 0) {
                     holdDirectionsToGo[holdDirectionsPos] = (parseInt(yPos) - 1) + "," + xPos;
                     holdDirectionsPos++;
@@ -554,9 +535,8 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         }
         return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
     }
-
+    //Changes color of a point and updates localstorage,and array
     function setPointValue(yCoord, xCoord, newVal, dontChange) {
-        // alert("HOW");
         arr = JSON.parse(localStorage.getItem("arr"));
         var environmentUpdated = true;
         var idName = "innerCell" + yCoord + "X" + xCoord;
@@ -570,7 +550,6 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
             if (containsPath) {
                 resetMaze(true);
             }
-            //innerCell.style.backgroundColor = "red";
             innerCell.classList.add('majorPointCell');
             innerImg.src = targetnode;
             innerImg.style.display = 'block';
@@ -586,6 +565,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 imgId = "innerCell" + lastGoodY + "X" + lastGoodX + "I";
                 innerImg = document.getElementById(imgId);
             }
+            //If path is being updated,path is reset
             if (containsPath) {
                 resetMaze(true);
             }
@@ -628,18 +608,18 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         }
         localStorage.setItem("arr", JSON.stringify(arr));
     }
-
+    //Gets value of a node
     function getPointValue(yCoord, xCoord) {
         arr = JSON.parse(localStorage.getItem("arr"));
         return arr[yCoord][xCoord];
     }
-
+    //Checks if popup needs to load(only shows up once)
     function popupLoaded() {
         if (localStorage.getItem("popupclosed") !== "yes") {
             document.getElementById("initialPopup").style.display = "block";
         }
     }
-
+    //Close pop up
     function closeButtonClicked() {
         for (var x = 0; x < holdPopups.length; x++) {
             holdPopups[x].style.display = "none";
@@ -651,27 +631,21 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
         var holdLoc = ev.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
         setPointValue(holdLoc[0], holdLoc[1], "WALL");
     }
-
+    //Clear maze
     function resetMaze(justPath) {
         var newarr = JSON.parse(localStorage.getItem("arr"));
-
-        //alert("searching:" + localStorage.getItem("searching"));
         if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
-            // alert("PASSCHECK");
             var lengthOfArray = arr.length;
             for (var y = 0; y < lengthOfArray; y++) {
                 for (var x = 0; x < lengthOfArray; x++) {
                     var pointVal = getPointValue(y, x);
+                    //Checks if only path should be reset(if not reset walls also)
                     if (!(pointVal === "END" || pointVal === "START") && !justPath) {
                         setPointValue(y, x, "EMPTY", false);
                         newarr[y][x] = "EMPTY";
                         localStorage.setItem("arr", JSON.stringify(newarr));
-
-                        /*var idName = "innerCell" + y + "X" + x;
-                        var pointToRemoveColorFrom = document.getElementById(idName);
-                        pointToRemoveColorFrom.classList.remove('searchedPathCell');
-                        pointToRemoveColorFrom.classList.remove('finalPathCell');*/
                     }
+                    //Resets path
                     var idName = "innerCell" + y + "X" + x;
                     var pointToRemoveColorFrom = document.getElementById(idName);
                     pointToRemoveColorFrom.classList.remove('searchedPathCell');
@@ -680,10 +654,9 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                     pointToRemoveColorFrom.classList.remove('walCell');
                 }
             }
-            //localStorage.setItem("arr",JSON.stringify(newarr));
         }
     }
-
+    //Create maze and save it to local storage
     function createMaze(length) {
         var arrayDiffSize = false;
         arr = JSON.parse(localStorage.getItem("arr"));
@@ -721,9 +694,9 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                 var insideElement = document.createElement("div");
                 insideElement.id = "innerCell" + y + "X" + x;
                 insideElement.className = "innerCell";
+                //Check if mouse has entered node
                 insideElement.onmouseenter = (ev) => {
                     arr = JSON.parse(localStorage.getItem("arr"));
-                    //alert(localStorage.getItem("searching"));
                     if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (mouseDown === 1) {
                             var thingClicked = ev.target.id.replaceAll("I", "");
@@ -749,17 +722,13 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                                 }
                                 innerImg.style.display = 'block';
                             } else {
-                                //alert("SUP:" + )
                                 changeTile(ev)
                             }
                         }
-                        //alert("Settingarr:" + arr);
-                        //arr = localStorage
-                        //localStorage.setItem("arr", JSON.stringify(arr));
                     }
                 }
+                //Check if mouse left node
                 insideElement.onmouseleave = (ev) => {
-                    //arr = JSON.parse(localStorage.getItem("arr"));
                     if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (mouseDown === 1) {
                             if (draggingItemMode) {
@@ -777,9 +746,9 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                                 }
                             }
                         }
-                        //localStorage.setItem("arr", JSON.stringify(arr));
                     }
                 }
+                //Check if mouse is down on node
                 insideElement.onmousedown = e => {
                     if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (e.button === 2) {
@@ -801,6 +770,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                         localStorage.setItem("arr", JSON.stringify(arr));
                     }
                 }
+                //Check if mouse is up on node
                 insideElement.onmouseup = e => {
                     if (e.button === 2) {
                         var thingClicked = e.target.id.replaceAll("I", "");
@@ -832,6 +802,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
                         }
                     }
                 }
+                //Add element to main div
                 var insideImg = document.createElement("img");
                 insideImg.style.width = '80%';
                 insideImg.style.position = 'center';
@@ -859,6 +830,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
 
             }
         }
+        //Check if start and end node exist. If they don't create them
         var mainPointsExist = localStorage.getItem("mainpoints") === 'true';
         if (length > 1 && !mainPointsExist) {
             setPointValue(yLocOfStart, 0, "START");

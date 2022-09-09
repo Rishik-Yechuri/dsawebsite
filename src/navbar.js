@@ -8,13 +8,16 @@ import AlgorithmsDropdown from "./algorithmsDropdown";
 import {usePrevious} from "react-use";
 
 const navbar = ({setState,setAlgoState,setButtonState,buttonState,resetState,setResetState}) => {
+   //Updates length state
     const updateLength = (event) =>{
         const inputVal = event.target.value;
         setState(inputVal);
     }
+    //Updates visualize button state
     const updateButtonState = (event) => {
         setButtonState(buttonState+1);
     }
+    //Updates reset button state
     const updateResetState = (event) => {
         setResetState(resetState+1);
     }
