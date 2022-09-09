@@ -3,17 +3,20 @@ import dropDown from "./dropdown.png";
 import './navbarcss.css';
 
 
-
 const ArrayAlgorithmComponent = ({setArraySortMethod}) => {
+    //Sets dropdown state
     var dropDownActivated = false;
-    document.addEventListener("click",function (event){
-        if(event.target.closest("#dropdownDiv")){
+    //Waits for click
+    document.addEventListener("click", function (event) {
+        if (event.target.closest("#dropdownDiv")) {
             return;
-        }else{
+        } else {
             document.getElementById("thirdContent").style.display = 'none';
             dropDownActivated = false;
         }
     })
+
+    //Update dropdown
     function structureDropdown() {
         if (dropDownActivated) {
             document.getElementById("thirdContent").style.display = 'none';
@@ -21,10 +24,12 @@ const ArrayAlgorithmComponent = ({setArraySortMethod}) => {
         if (!dropDownActivated) {
             document.getElementById("thirdContent").style.display = 'block';
         }
+        //Update dropdown state
         dropDownActivated = !dropDownActivated;
-
     }
-    function updateDropdownText(newText){
+
+    //Updates text for dropdown
+    function updateDropdownText(newText) {
         document.getElementById("algText").textContent = "Algorithm:" + newText;
         setArraySortMethod(newText);
     }

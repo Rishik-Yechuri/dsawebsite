@@ -1,26 +1,25 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import "./ArrayComponentStyle.css"
-import Draggable from "react-draggable";
 
 const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMethod}) => {
-    //localStorage.setItem("searching","false");
+    //Initializes variables
     const [searchingState, setSearchingState] = useState("false");
     var arr = JSON.parse(localStorage.getItem("barArray"));
     var valArr = JSON.parse(localStorage.getItem("barValueArray"));
 
-
+    //Function that is used for Quick Sort
     async function partition(arr, low, high) {
-        //alert("top Partition");
+        //Gets bar height at index high
         var x = await getBarHeight(high);
         var i = low - 1
-        //alert("HERE1");
+        //Loops from index j to high
         for (var j = low; j <= high - 1; j++) {
+            //Sets two bars to yellow to indicate they are being searched
             await setBarValue(j, "SEARCHING");
             await setBarValue(high, "SEARCHING");
-            /* if(localStorage.getItem("searching") !== "true"){
-                 return null;
-             }*/
+            //Pauses so user can see what is happening
             await new Promise(done => setTimeout(() => done(), 10));
+            //Compares bar height to x
             if (await getBarHeight(j) <= x) {
                 i++
                 var temp = await getBarHeight(i);
@@ -29,82 +28,66 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
                 arr[j] = temp
                 await changeBarHeight(j, temp);
             }
+            //Changes bar colors back to original color
             await setBarValue(j, "NONE");
             await setBarValue(high, "NONE");
         }
-        //alert("HERE2");
-        var temp = await getBarHeight(i + 1);//= arr[i + 1]
-        //alert("HERE3");
+        //Swaps bar heights
+        var temp = await getBarHeight(i + 1);
         arr[i + 1] = await getBarHeight(high);//arr[high]
-        //alert("HERE4");
         await changeBarHeight(i + 1, await getBarHeight(high));
-        //alert("HERE5");
         arr[high] = temp;
-        //alert("HERE5.5:" + high);
         await changeBarHeight(high, temp);
-        //alert("HERE5.75");
-        //alert("HERE6");
-        /* if(localStorage.getItem("searching") !== "true"){
-             return null;
-         }*/
         return i + 1
     }
 
     async function mergeSort(array, startPos) {
+        //Finds the midpoint in the array
         const half = Math.floor(array.length / 2)
-        // Base case or terminating case
+        //Base case
         if (array.length < 2) {
             return array
         }
-        /* alert("HERE 2:" + array.length);
-         alert("StartPos:" + startPos);
-         alert("Half:" + half);*/
+        //Splits array in half
         const left = array.splice(0, half);
-        /*if(localStorage.getItem("searching") !== "true"){
-            return null;
-        }*/
+        //Calls merge sort on both sides and merges them together
         return await merge(await mergeSort(left, (startPos)), await mergeSort(array, (half + startPos)), startPos, half + startPos);
     }
 
+    //Combines two sorted arrays into one sorted array
     async function merge(left, right, leftPos, rightPos) {
+        //Gets size of both arrays
         var numOfElementsLeft = left.length;
         var numOfElementsRight = right.length;
         var startPoint = leftPos;
         var numOfElements = left.length + right.length;
         let arr = []
-        /*  alert("LEFT:" + left.length);
-          alert("RIGHT:" + right.length);*/
-        //Break out of loop if any one of the array gets empty
+        //Loops as long as both arrays have elements
         while ((numOfElementsLeft > 0 && numOfElementsRight > 0)) {
-            /* alert("Something has");
-             alert("LEFT:" + left.length);
-             alert("RIGHT:" + right.length);
-             alert("LeftPos:" + leftPos);
-             alert("RightPos:" + rightPos);*/
-            //Pick the smaller among the smallest element of left and right sub arrays
+            //Changes color of the two bars being compared
             setBarValue(leftPos, "SEARCHING");
             setBarValue(rightPos, "SEARCHING");
-            // alert("Searching Set");
+            //Pause so user can see what is happening
             await new Promise(done => setTimeout(() => done(), 10));
+            //Changes bar colors back to original
             setBarValue(leftPos, "NONE");
             setBarValue(rightPos, "NONE");
-            // alert("Bar set");
+            //Compares values of both sides
             if (left[0] < right[0]) {
+                //Pushes element from left array side
                 arr.push(left.shift());
                 leftPos++;
                 numOfElementsLeft--;
-                // alert("left push");
             } else {
+                //Pushes element from right array
                 var thingToPush = right.shift();
-                // alert("right push:" + thingToPush);
                 arr.push(thingToPush);
                 rightPos++;
                 numOfElementsRight--;
             }
         }
 
-        // Concatenating the leftover elements
-        // (in case we didn't go through the entire left or right array)
+        //Adds any leftover values
         while (numOfElementsLeft > 0) {
             arr.push(left.shift());
             numOfElementsLeft--;
@@ -113,34 +96,37 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
             arr.push(right.shift());
             numOfElementsRight--;
         }
+        //Changes everything to green(completed)
         for (var i = 0; i < numOfElements; i++) {
-            //  alert("here");
-            //var barID = "bar" + (parseInt(startPoint) + parseInt(i));
-            // alert("NewHeight:" + arr[i]);
             changeBarHeight((parseInt(startPoint) + i), arr[i] * 2.5);
             await new Promise(done => setTimeout(() => done(), 20));
         }
         return arr;
     }
 
+    //Call quicksort
     async function quickSortCaller(arr, low, high) {
-        await quickSort(arr, low, high).then(r => {});
+        await quickSort(arr, low, high).then(r => {
+        });
     }
 
+    //Quick Sort algorithm
     async function quickSort(arr, low, high, currIteration) {
+        //Keeps going as long as low is less than high
         if (low < high) {
-            //alert("Await partition");
+            //Finds next index
             var index = await partition(arr, low, high);
-            //alert("Index:" + index);
+            //Set that one bar to finished status
             await setBarValue(index, "FINISHED");
             currIteration++;
-            //alert("PARTITION:" + index);
+            //Calls quicksort on left side
             if (low < index - 1) {
                 await quickSort(arr, low, index - 1, currIteration + 1)
             } else if (index - 1 >= 0) {
                 await setBarValue(index - 1, "FINISHED");
                 currIteration++;
             }
+            //Calls quicksort on right side
             if (index + 1 < high) {
                 await quickSort(arr, index + 1, high, currIteration + 1)
             } else {
@@ -152,83 +138,48 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
     }
 
     async function selectionSort(inputArr) {
-        /*   if(localStorage.getItem("searching") !== "true"){
-               return null;
-           }*/
+        //Gets size of array
         let n = inputArr.length;
-
         for (let i = 0; i < n; i++) {
-            /*if(localStorage.getItem("searching") !== "true"){
-                return null;
-            }*/
             // Finding the smallest number in the subarray
             let min = i;
             for (let j = i + 1; j < n; j++) {
+                //Sets the status of the two bars to searching
                 setBarValue(j, "SEARCHING");
-                //if (j + 1 < arrLen) {
                 setBarValue(min, "SEARCHING");
-                //}
+                //Pause to allow user to see what is happening
                 await new Promise(done => setTimeout(() => done(), 10));
+                //Change bar color back to original
                 setBarValue(min, "NONE");
-                //if (j + 1 < arrLen) {
                 setBarValue(j, "NONE");
+                //Compare heights
                 if (getBarHeight(j) < getBarHeight(min)) {
                     min = j;
                 }
             }
-            /*setBarValue(min, "NONE");
-            //if (j + 1 < arrLen) {
-                setBarValue(n-1, "NONE");*/
-            //}
             if (min !== i) {
-                // Swapping the elements
-                //setBarValue(min, "SEARCHING");
-                //if (j + 1 < arrLen) {
-                // setBarValue(i, "SEARCHING");
-                //await new Promise(done => setTimeout(() => done(), 100));
-
-                //}
                 let tmp = getBarHeight(i);
                 inputArr[i] = getBarHeight(min);
                 changeBarHeight(i, inputArr[i]);
                 inputArr[min] = tmp;
                 changeBarHeight(min, tmp);
-
-
-                //setBarValue(min, "NONE");
-                //if (j + 1 < arrLen) {
             }
             setBarValue(i, "FINISHED");
             await new Promise(done => setTimeout(() => done(), 10));
-            /* if(localStorage.getItem("searching") !== "true"){
-                 return null;
-             }*/
         }
-        /* if(localStorage.getItem("searching") !== "true"){
-             return null;
-         }*/
         return inputArr;
     }
 
     async function bubbleSort(arr) {
         var arrLen = arr.length;
         for (var i = 0; i < arrLen; i++) {
-            // Last i elements are already in place
             for (var j = 0; j < (arrLen - i); j++) {
-                // Checking if the item at present iteration
-                // is greater than the next iteration
                 setBarValue(j, "SEARCHING");
                 if (j + 1 < arrLen) {
                     setBarValue(j + 1, "SEARCHING");
                 }
                 await new Promise(done => setTimeout(() => done(), 10));
                 if (arr[j] > arr[j + 1]) {
-                    /*setBarValue(j, "SWAPPING");
-                    if (j + 1 < arrLen) {
-                        setBarValue(j + 1, "SWAPPING");
-                    }
-                    await new Promise(done => setTimeout(() => done(), 100));*/
-                    // If the condition is true then swap them
                     var temp = getBarHeight(j);
                     arr[j] = getBarHeight(j + 1);
                     changeBarHeight(j, getBarHeight(j + 1));
@@ -241,14 +192,13 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
                 }
             }
         }
+        //Sets all bars to green(completed)
         for (var x = 0; x < arrLen; x++) {
             setBarValue(x, "FINISHED");
             await new Promise(done => setTimeout(() => done(), 10));
         }
-        // Print the sorted array
-        //console.log(arr);
     }
-
+    //Displays array when selected in navigation
     useEffect(() => {
         if (arrayHiddenState === true) {
             document.getElementById("arrayTopDiv").style.display = 'none';
@@ -256,15 +206,19 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
             document.getElementById("arrayTopDiv").style.removeProperty('display');
         }
     }, [arrayHiddenState]);
+
     useEffect(() => {
-        if(searchingState === "sorted"){
-            setSearchingState("false");
+        if (searchingState === "sorted") {
+            //setSearchingState("false");
         }
     }, [arraySortMethod]);
+    //Array is sorted when sort is clicked
     useEffect(async () => {
-        if(searchingState === "sorted"){
+        //If array is already sorted, generate new array
+        if (searchingState === "sorted") {
             await generateBars();
         }
+        //Start sorting if it isn't currently being sorted
         if (arraySort > 0 && searchingState !== "true") {
             var arrayOfHeights = JSON.parse(localStorage.getItem("barArray"));
             //Call the search algorithm
@@ -292,6 +246,7 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
             }
         }
     }, [arraySort]);
+    //Loads or generates bars when array is reset(first loaded/reset clicked)
     useEffect(() => {
         arr = JSON.parse(localStorage.getItem("barArray"));
         if (searchingState !== "true") {
@@ -307,6 +262,7 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
         return false;
     }
 
+    //Changes height of bar
     function changeBarHeight(barIndex, newHeight) {
         var arr = JSON.parse(localStorage.getItem("barArray"));
         arr[barIndex] = newHeight * 0.4;
@@ -316,11 +272,13 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
         localStorage.setItem("barArray", JSON.stringify(arr));
     }
 
+    //Returns height of bar
     function getBarHeight(barIndex) {
         var arr = JSON.parse(localStorage.getItem("barArray"));
         return arr[barIndex] * 2.5;
     }
 
+    //Change color of bar
     function setBarValue(barIndex, newVal) {
         valArr = JSON.parse(localStorage.getItem("barValueArray"));
         var barID = "bar" + barIndex;
@@ -332,6 +290,7 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
         localStorage.setItem("barValueArray", JSON.stringify(valArr));
     }
 
+    //Load  bars from memory
     function loadBars() {
         arr = JSON.parse(localStorage.getItem("barArray"));
         const parent = document.getElementById("arrayBarHolder");
@@ -344,8 +303,8 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
         }
     }
 
+    //Generates bars randomly(height set from 1-100)
     function generateBars() {
-
         arr = JSON.parse(localStorage.getItem("barArray"));
         if (arr === null) {
             arr = [];
@@ -370,8 +329,9 @@ const ArrayComponent = ({arrayHiddenState, arrayReset, arraySort, arraySortMetho
         localStorage.setItem("barValueArray", JSON.stringify(valArr));
     }
 
+    //Holds state for zoom
     let [zoomSize, setZoomSize] = useState({zoomSize: 1});
-
+    //Zooms in on array
     var zoom = (event) => {
         var arrayHolderDiv = document.getElementById("arrayHolderDiv");
         var zoomSpeed = (-.001) * (.55);

@@ -895,8 +895,7 @@ const MazeComponent = ({state, algoState, buttonState, setState, resetState}) =>
 
             <div className={"popUpContent"} id={"initialPopup"}>
                 <div id={"popUpInner"}>
-                    <text className={"popUpText"}>Left clicking a empty square will place a wall. The Starting Node and
-                        Target Node can be dragged around.
+                    <text className={"popUpText"}>Walls can be placed/removed by right clicking. The starting node and target node can be dragged around. Left clicking and dragging will move the graph. The scrollbar can be used to zoom.
                     </text>
                 </div>
                 <div id={"lowerPopUpDiv"}>

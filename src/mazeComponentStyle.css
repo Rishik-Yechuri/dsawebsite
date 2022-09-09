@@ -16,7 +16,9 @@
     justify-content: center;
     overflow: hidden;
 }
-
+.popUpText{
+    color: #dddddd;
+}
 #mazeHolderDiv {
     width: fit-content;
     height: fit-content;
@@ -85,7 +87,9 @@ div.dragCell:hover{
 .popUpContent {
     width: 22em;
     height: 30em;
-    background-color: #8919AB;
+    background-color: #666666;
+    border-color: #33cc33;
+    border-radius: .8em;
     position: absolute;
     z-index: 10;
     vertical-align: center;
@@ -99,7 +103,7 @@ div.dragCell:hover{
 }
 
 #popUpInner {
-    background-color: orangered;
+    background-color: #666666;
     height: 24em;
     width: 18em;
     margin: 2em;

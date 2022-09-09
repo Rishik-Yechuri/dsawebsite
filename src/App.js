@@ -13,11 +13,7 @@ import ArrayComponent from "./ArrayComponent";
 
 
 function App() {
-    /* var arr = JSON.parse(localStorage.getItem("arr"));
-     var tempLen = arr.length
-     if(arr.length > 1){
-         const [state,setState] = useState(4);
-     }*/
+    //Create states that are used in other parts of the program
     const [state, setState] = useState(0);
     const [algoState, setAlgoState] = useState("A*");
     const [buttonState, setButtonState] = useState(0);
