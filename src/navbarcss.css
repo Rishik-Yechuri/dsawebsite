@@ -1,6 +1,7 @@
 .topBar {
     width:100%;
     background-color: #666666;
+    max-width: 100%;
    /* position: absolute;
     top: 0;
     left: 0;*/
@@ -20,6 +21,8 @@
 
 .halfDiv {
     height: 2.25em;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 #topDiv {
@@ -106,7 +109,7 @@
 #createButton:hover {
 }
 .button{
-    background-color: #8919AB;
+    background-color: #202020;
     outline: none;
     border-style: none;
     color: #cccccc;
@@ -118,7 +121,7 @@
     border-radius: .5em;
 }
 .button:hover{
-    background-color: #A939CB;
+    background-color: #343434;
 }
 #sizeInputField::placeholder {
     color: #bbbbbb;
@@ -168,16 +171,21 @@
 #visitedNode{
     width: 1.4em;
     height: 1.4em;
-    background-color: yellow;
+    min-width: 1.4em;
+    background-color: #DDDD22;
 }
 #finalPath{
     width: 1.4em;
     height: 1.4em;
-    background-color: lawngreen;
+    min-width: 1.4em;
+
+    background-color: #33cc33;
 }
 #wall{
     width: 1.4em;
     height: 1.4em;
+    min-width: 1.4em;
+
     background-color: black;
 }
 

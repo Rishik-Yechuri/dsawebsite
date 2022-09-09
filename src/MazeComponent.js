@@ -6,7 +6,7 @@ import targetnode from "./targetnode.png"
 import Cookies from 'universal-cookie';
 
 
-const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => {
+const MazeComponent = ({state, algoState, buttonState, setState, resetState}) => {
     let yLocOfStart = 8;
     var lastGoodY;
     var lastGoodX;
@@ -108,31 +108,31 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
     }
 
     async function startSearching() {
-        if(localStorage.getItem("searching") !== "true"){
+        if (localStorage.getItem("searching") !== "true") {
             resetMaze(true);
 
             localStorage.setItem("searching", "true");
-        //alert("SETTO:" + localStorage.getItem("searching"));
-        arr = JSON.parse(localStorage.getItem("arr"));
-        var holdState = algoState.toString();
-        if (holdState === "A*") {
+            //alert("SETTO:" + localStorage.getItem("searching"));
             arr = JSON.parse(localStorage.getItem("arr"));
-            const path = await aStar(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
-            await drawPath(path);
-        } else if (holdState === "Breadth First") {
-            const path = await BFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
-            await drawPath(path);
-        } else if (holdState === "Depth First") {
-            var set = new Set();
-            var arrForFinish = [false];
-            const path = await DFSCaller(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")), new Map(), arr.length, set, arrForFinish, undefined);
-            //return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
-            await drawPath(path);
-        } else if (holdState === "Bidirectional") {
-            const path = await BiBFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
-            await drawPath(path);
+            var holdState = algoState.toString();
+            if (holdState === "A*") {
+                arr = JSON.parse(localStorage.getItem("arr"));
+                const path = await aStar(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
+                await drawPath(path);
+            } else if (holdState === "Breadth First") {
+                const path = await BFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
+                await drawPath(path);
+            } else if (holdState === "Depth First") {
+                var set = new Set();
+                var arrForFinish = [false];
+                const path = await DFSCaller(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")), new Map(), arr.length, set, arrForFinish, undefined);
+                //return reconstructPath((startY + "," + startX), (finishY + "," + finishX), prev);
+                await drawPath(path);
+            } else if (holdState === "Bidirectional") {
+                const path = await BiBFS(arr, JSON.parse(localStorage.getItem("starty")), JSON.parse(localStorage.getItem("startx")), JSON.parse(localStorage.getItem("endy")), JSON.parse(localStorage.getItem("endx")));
+                await drawPath(path);
+            }
         }
-    }
     }
 
     class Queue {
@@ -556,6 +556,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
     }
 
     function setPointValue(yCoord, xCoord, newVal, dontChange) {
+        // alert("HOW");
         arr = JSON.parse(localStorage.getItem("arr"));
         var environmentUpdated = true;
         var idName = "innerCell" + yCoord + "X" + xCoord;
@@ -566,7 +567,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
         innerCell.classList.remove('majorPointCell');
         var containsPath = (innerCell.classList.contains("searchedPathCell") || innerCell.classList.contains("finalPathCell") || innerCell.classList.contains("biPathCell"));
         if (newVal === "END" && arr[yCoord][xCoord] !== "START") {
-            if(containsPath){
+            if (containsPath) {
                 resetMaze(true);
             }
             //innerCell.style.backgroundColor = "red";
@@ -585,7 +586,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 imgId = "innerCell" + lastGoodY + "X" + lastGoodX + "I";
                 innerImg = document.getElementById(imgId);
             }
-            if(containsPath){
+            if (containsPath) {
                 resetMaze(true);
             }
             innerCell.classList.add('majorPointCell');
@@ -601,7 +602,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
             innerCell.classList.remove('wallCell');
             var containsPath = (innerCell.classList.contains("searchedPathCell") || innerCell.classList.contains("finalPathCell") || innerCell.classList.contains("biPathCell"));
             if (newVal === "WALL") {
-                if(containsPath){
+                if (containsPath) {
                     resetMaze(true);
                 }
                 if (arr[yCoord][xCoord] === "WALL" && !dontChange) {
@@ -613,7 +614,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 }
             } else if (newVal === "PATH") {
                 //innerCell.style.backgroundColor = "yellow";
-               // innerCell.classList.add('searchedPathCell');
+                // innerCell.classList.add('searchedPathCell');
             } else if (newVal === "FINALPATH") {
                 innerCell.style.backgroundColor = "purple";
             } else {
@@ -652,30 +653,35 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
     }
 
     function resetMaze(justPath) {
+        var newarr = JSON.parse(localStorage.getItem("arr"));
+
         //alert("searching:" + localStorage.getItem("searching"));
-        if(localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null){
-           // alert("PASSCHECK");
-        var lengthOfArray = arr.length;
-        for (var y = 0; y < lengthOfArray; y++) {
-            for (var x = 0; x < lengthOfArray; x++) {
-                var pointVal = getPointValue(y, x);
-                if (!(pointVal === "END" || pointVal === "START") && !justPath) {
-                    setPointValue(y, x, "EMPTY", false);
-                    /*var idName = "innerCell" + y + "X" + x;
+        if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
+            // alert("PASSCHECK");
+            var lengthOfArray = arr.length;
+            for (var y = 0; y < lengthOfArray; y++) {
+                for (var x = 0; x < lengthOfArray; x++) {
+                    var pointVal = getPointValue(y, x);
+                    if (!(pointVal === "END" || pointVal === "START") && !justPath) {
+                        setPointValue(y, x, "EMPTY", false);
+                        newarr[y][x] = "EMPTY";
+                        localStorage.setItem("arr", JSON.stringify(newarr));
+
+                        /*var idName = "innerCell" + y + "X" + x;
+                        var pointToRemoveColorFrom = document.getElementById(idName);
+                        pointToRemoveColorFrom.classList.remove('searchedPathCell');
+                        pointToRemoveColorFrom.classList.remove('finalPathCell');*/
+                    }
+                    var idName = "innerCell" + y + "X" + x;
                     var pointToRemoveColorFrom = document.getElementById(idName);
                     pointToRemoveColorFrom.classList.remove('searchedPathCell');
-                    pointToRemoveColorFrom.classList.remove('finalPathCell');*/
+                    pointToRemoveColorFrom.classList.remove('finalPathCell');
+                    pointToRemoveColorFrom.classList.remove('biPathCell');
+                    pointToRemoveColorFrom.classList.remove('walCell');
                 }
-                var idName = "innerCell" + y + "X" + x;
-                var pointToRemoveColorFrom = document.getElementById(idName);
-                pointToRemoveColorFrom.classList.remove('searchedPathCell');
-                pointToRemoveColorFrom.classList.remove('finalPathCell');
-                pointToRemoveColorFrom.classList.remove('biPathCell');
-
             }
-
+            //localStorage.setItem("arr",JSON.stringify(newarr));
         }
-    }
     }
 
     function createMaze(length) {
@@ -716,6 +722,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                 insideElement.id = "innerCell" + y + "X" + x;
                 insideElement.className = "innerCell";
                 insideElement.onmouseenter = (ev) => {
+                    arr = JSON.parse(localStorage.getItem("arr"));
                     //alert(localStorage.getItem("searching"));
                     if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (mouseDown === 1) {
@@ -742,13 +749,17 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                                 }
                                 innerImg.style.display = 'block';
                             } else {
+                                //alert("SUP:" + )
                                 changeTile(ev)
                             }
                         }
-                        localStorage.setItem("arr", JSON.stringify(arr));
+                        //alert("Settingarr:" + arr);
+                        //arr = localStorage
+                        //localStorage.setItem("arr", JSON.stringify(arr));
                     }
                 }
                 insideElement.onmouseleave = (ev) => {
+                    //arr = JSON.parse(localStorage.getItem("arr"));
                     if (localStorage.getItem("searching") === "false" || localStorage.getItem("searching") === null) {
                         if (mouseDown === 1) {
                             if (draggingItemMode) {
@@ -766,7 +777,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                                 }
                             }
                         }
-                        localStorage.setItem("arr", JSON.stringify(arr));
+                        //localStorage.setItem("arr", JSON.stringify(arr));
                     }
                 }
                 insideElement.onmousedown = e => {
@@ -796,7 +807,7 @@ const MazeComponent = ({state, algoState, buttonState, setState,resetState}) => 
                         var thing = document.getElementById(thingClicked);
                         if (draggingItemMode) {
                             var holdLoc = e.target.id.replaceAll("I", "").split('innerCell')[1].split('X');
-                            if ((itemBeingDragged !== "START" && arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END" && itemBeingDragged!=="END")) {
+                            if ((itemBeingDragged !== "START" && arr[holdLoc[0]][holdLoc[1]] === "START" || arr[holdLoc[0]][holdLoc[1]] === "END" && itemBeingDragged !== "END")) {
                                 if (lastGoodY === undefined || lastGoodX === undefined) {
                                     if (arr[holdLoc[0]][holdLoc[1]] === "START") {
                                         holdLoc[0] = yLocOfStart;

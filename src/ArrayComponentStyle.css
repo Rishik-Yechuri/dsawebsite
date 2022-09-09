@@ -9,7 +9,7 @@
     width: 100%;
     height: 100%;
     max-height: 100%;
-    background-color: greenyellow;
+    background-color: #999999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -24,12 +24,16 @@
     height: fit-content;
     align-content: center;
     vertical-align: center;
+    /*
     background-color: darkorange;
+    */
 }
 #arrayBarHolder{
     width: 58em;
     height: 40em;
-    background-color: hotpink;
+    background-color: #AAAAAA;
+    border-color: #DDDDDD;
+
     display: flex;
     flex-direction: row;
     vertical-align: center;
@@ -37,23 +41,24 @@
 #arrayBottomLine{
     width: 58em;
     height: .35em;
-    background-color: mediumpurple;
+    background-color: #DDDDDD;
+
 }
 .heightBar{
     width: .48em;
     margin-left: .05em;
     margin-right: .05em;
     align-self: flex-end;
-    background-color: crimson;
+    background-color: #333333;
 }
 .NONE{
-    background-color: crimson;
+    background-color: #333333;
 }
 .SEARCHING{
-    background-color: yellow;
+    background-color: #DDDD22;
 }
 .FINISHED{
-    background-color: green;
+    background-color: #33cc33;
 }
 /*
 #mazeHolderDiv {
