@@ -1,0 +1,168 @@
+/*#mainDiv {
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+}*/
+
+#arrayTopDiv {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    background-color: #999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: center;
+    overflow: hidden;
+
+}
+#arrayHolderDiv{
+    display: flex;
+    flex-wrap: wrap;
+    width: 58em;
+    height: fit-content;
+    align-content: center;
+    vertical-align: center;
+    /*
+    background-color: darkorange;
+    */
+}
+#arrayBarHolder{
+    width: 58em;
+    height: 40em;
+    background-color: #AAAAAA;
+    border-color: #DDDDDD;
+
+    display: flex;
+    flex-direction: row;
+    vertical-align: center;
+}
+#arrayBottomLine{
+    width: 58em;
+    height: .35em;
+    background-color: #DDDDDD;
+
+}
+.heightBar{
+    width: .48em;
+    margin-left: .05em;
+    margin-right: .05em;
+    align-self: flex-end;
+    background-color: #333333;
+}
+.NONE{
+    background-color: #333333;
+}
+.SEARCHING{
+    background-color: #DDDD22;
+}
+.FINISHED{
+    background-color: #33cc33;
+}
+
+/*
+#mazeHolderDiv {
+    width: fit-content;
+    height: fit-content;
+    !*   background-color: green;*!
+    transform: scale(1);
+}
+
+#wrapperDiv {
+    align-self: center;
+}
+
+Draggable {
+    width: fit-content;
+    height: fit-content;
+}
+
+.innerCell {
+    width: 2.95em;
+    height: 2.95em;
+    border-style: solid;
+    border-color: whitesmoke;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 70%;
+    background-color: purple;
+    align-self: center;
+    align-items: center;
+    display: flex;
+    horiz-align: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+}
+div.dragCell{
+    background-color: orange;
+}
+.innerCell:hover{
+    background-color: hotpink;
+}
+div.dragCell:hover{
+    background-color: orange;
+}
+.wallCell{
+    background-color: black;
+}
+.majorPointCell{
+    background-color: red;
+}
+!*.hoverCell{
+    background-color: orange;
+}*!
+
+
+.popUpContent {
+    width: 22em;
+    height: 30em;
+    background-color: #8919AB;
+    position: absolute;
+    z-index: 10;
+    vertical-align: center;
+    align-self: center;
+    horiz-align: center;
+    display: none;
+}
+
+.popUpText {
+    overflow-wrap: break-word;
+}
+
+#popUpInner {
+    background-color: orangered;
+    height: 24em;
+    width: 18em;
+    margin: 2em;
+    margin-bottom: 1.3em;
+}
+
+#closeButton {
+    background-color: #333333;
+    border-style: solid;
+    height: 2.5em;
+    width: 6em;
+    border-radius: .8em;
+    color: white;
+}
+
+#lowerPopUpDiv {
+    width: available;
+    vertical-align: center;
+    align-self: center;
+    horiz-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.wideDiv {
+    display: flex;
+}
+
+html, body, #root, .App {
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+}
+*/

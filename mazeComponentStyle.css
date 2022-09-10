@@ -1,0 +1,139 @@
+#mainDiv {
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#mazeTopDiv {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    background-color: #999999;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+.popUpText{
+    color: #dddddd;
+}
+#mazeHolderDiv {
+    width: fit-content;
+    height: fit-content;
+ /*   background-color: green;*/
+    transform: scale(1);
+}
+
+#wrapperDiv {
+    align-self: center;
+}
+
+Draggable {
+    width: fit-content;
+    height: fit-content;
+}
+
+.innerCell {
+    width: 2.95em;
+    height: 2.95em;
+    border-style: solid;
+    border-color: #DDDDDD;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 70%;
+    background-color: #AAAAAA;
+    align-self: center;
+    align-items: center;
+    display: flex;
+    horiz-align: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+}
+div.dragCell{
+    background-color: #F6B611;
+}
+.innerCell:hover{
+    background-color: #cccccc;
+}
+div.dragCell:hover{
+ background-color: orange;
+}
+.wallCell{
+    background-color: black;
+}
+.wallCell:hover{
+    background-color: #777777;
+
+}
+.majorPointCell{
+    background-color: #AAAAAA;
+}
+.finalPathCell{
+    background-color: #33cc33;
+}
+.searchedPathCell{
+    background-color: #DDDD22;
+}
+.biPathCell{
+    background-color: blue;
+}
+/*.hoverCell{
+    background-color: orange;
+}*/
+
+
+.popUpContent {
+    width: 22em;
+    height: 30em;
+    background-color: #666666;
+    border-color: #33cc33;
+    border-radius: .8em;
+    position: absolute;
+    z-index: 10;
+    vertical-align: center;
+    align-self: center;
+    horiz-align: center;
+    display: none;
+}
+
+.popUpText {
+    overflow-wrap: break-word;
+}
+
+#popUpInner {
+    background-color: #666666;
+    height: 24em;
+    width: 18em;
+    margin: 2em;
+    margin-bottom: 1.3em;
+}
+
+#closeButton {
+    background-color: #333333;
+    border-style: solid;
+    height: 2.5em;
+    width: 6em;
+    border-radius: .8em;
+    color: white;
+}
+
+#lowerPopUpDiv {
+    width: available;
+    vertical-align: center;
+    align-self: center;
+    horiz-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.wideDiv {
+    display: flex;
+}
+
+html, body, #root, .App {
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+}
