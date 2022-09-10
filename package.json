@@ -1,6 +1,5 @@
 {
   "name": "dsawebsite",
-  "homepage": "https://rishik-yechuri.github.io/dsawebsite/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
